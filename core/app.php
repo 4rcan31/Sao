@@ -16,6 +16,7 @@ class App{
         $this->runAppHttp();
         $this->runAppRouting();
         $this->runAppApp();
+        $this->runAppApi();
     }
     //End Autoloader
 
@@ -60,10 +61,14 @@ class App{
         include($this->path.'/core/Controller/baseController.php');
     
     }
-
     private function runAppModel(){
         include($this->path.'/core/Model/baseModel.php');
     }
     //End App App
+
+
+    private function runAppApi(){
+        include($this->path.'/routes/api.php'); 
+    }
 
 }
