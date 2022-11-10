@@ -1,7 +1,7 @@
 <?php 
 
 
-class Response{
+class Response extends Request{
     /**
      * Send API output.
      *
