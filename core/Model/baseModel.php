@@ -1,6 +1,6 @@
 <?php 
 
 
-class BaseModel{
+class BaseModel extends ORM{
     
 }

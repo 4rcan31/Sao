@@ -1,61 +1,72 @@
-<?php 
-
+<?php
 
 class Router extends Request{
-    static public $routes = [
+
+    private static $routes = [
         'GET' => [], 
         'POST'=> [],
         'PUT' => [], 
         'DELETE' => []
     ]; //pool of routes definidas
 
+    private static $callables = [
+        'GET' => [], 
+        'POST'=> [],
+        'PUT' => [], 
+        'DELETE' => []
+    ];
 
 
+    public static function add($uri, $method, $action = null) {
+        array_push(Router::$routes[$method], '/' . trim($uri, '/'));
+        if ($action != null) {
+            array_push(self::$callables[$method], $action);
+        }
 
-    static public function get(){
-        self::createPool(func_get_args(), 'GET');
-    }
-    static public function post(){
-        self::createPool(func_get_args(), 'POST');
-    }
-    static public function put(){
-        self::createPool(func_get_args(), 'PUT');
-    }
-    static public function delete(){
-        self::createPool(func_get_args(), 'DELETE');
-    }
-
-
-    static public function createPool($args, $method){
-        $callable = array_pop($args); //Funciones
-        $routes = array_shift($args); //Rutas
-        array_push(self::$routes[$method], $routes, $callable);
-       // array_push(self::$callable, $callable);
     }
 
 
+     public static function get($uri, $callable){
+        self::add($uri, 'GET', $callable);
+    }
+    public static function post($uri, $callable){
+        self::add($uri, 'POST', $callable);
+    }
 
+    public static function put($uri, $callable){
+        self::add($uri, 'PUT', $callable);
+    }
 
-    static private function mapRoutes(){
-        foreach(self::$routes as $method => $routesAndCallables){
-           self::$routes[$method] =  array_chunk($routesAndCallables, 2);
+    public static function delete($uri, $callable){
+        self::add($uri, 'DELETE', $callable);
+    }
+
+    public static function run(){
+        $E404 = true;
+        $method = Request::$method;
+
+        foreach(self::$routes[$method] as $key => $route){
+            if(preg_match('#^'.$route.'$#', self::$uri)){
+                $E404 = false;
+                $action = self::$callables[self::$method][$key];
+                self::runAction($action);
+                return;
+            }
+        }
+        $E404 ? view('404', 'core/err/server') : null;
+
+    }
+
+    private static function runAction($action) {
+        if($action instanceof \Closure){
+            $action(request()->data());
+        }else{
+            $params = explode('@', $action);
+            $obj = new $params[0];
+            $obj->{$params[1]}();
         }
     }
 
 
-    static public function run(){
-        Request::verifyRequest();
-        Router::mapRoutes();
-
-        //var_dump(self::$routes);
-       // echo json_encode(self::$routes);
-    }
-
-
-
 }
-
-
-
-
-
+?>

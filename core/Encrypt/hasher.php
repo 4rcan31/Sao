@@ -3,7 +3,7 @@
 
 
 class Hasher{
-    public function hasher($PasswordInTextPlane){
+    public function hash($PasswordInTextPlane){
         $r = password_hash(
             base64_encode(
                 hash('sha256', $PasswordInTextPlane, true)
@@ -22,4 +22,7 @@ class Hasher{
         );
         return $r;
     }
+
+
+   
 }

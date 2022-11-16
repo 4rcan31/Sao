@@ -2,16 +2,48 @@
 
 
 class Request{
-    protected static $method;
-    protected static $uri;
-    protected static $request;
+    public static $method;
+    public static $uri;
 
-    static public function capture(){
+
+    
+    protected $request; //Estos son todos los datos 
+    public $path;
+
+    
+
+
+
+     public static function capture(){
+        
         self::$method = $_SERVER["REQUEST_METHOD"];
-        self::$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        self::$uri = (parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+        //$this->path = $path;
+
+       // echo 'HOLAAAAAAAAA, SI ME ESTOY EJECUTANDO, NO SE QUE PUERCAS ME PASAAAAAAA<br>';
     }
 
-    public function request(){
+
+    public function data(){
+        if(self::$method == 'GET'){
+            return $this->dataGET('ESTA ES UNA RUTA XD');
+        }else{
+            return $this->dataMethod();
+        }
+    }
+
+    public function dataGET($routeDefinida){
+        return 'This is the data GET';
+    }
+
+    public function dataMethod(){
+        return $_POST;
+    }
+
+    
+
+
+   /*  public function request(){
         return self::$request;
     }
 
@@ -29,20 +61,26 @@ class Request{
     }
 
 
-    static public function verifyRequest(){
+    static public function E404(){
         $routes = Router::$routes[self::$method]; 
-        foreach($routes as $route){
-            if(self::$uri === $route){
-                Request::data($route);
-                $callable = Router::$routes[self::$method][1];
-                $callable(new self);
-                return;
+
+        $E404 = true;
+        foreach($routes as $infoRoute){
+            if(in_array(self::$uri, $infoRoute)){
+                $E404 = false;
             }
         }
-        echo json_encode(array('El metodo no es soportado o la ruta no esta definida'));
-        die;
-        return;
-    }
+
+        if($E404){
+            echo '404';
+            die; return; exit;
+        }
+
+    } */
+
+  /*   static public function veryfyMethod(){
+        
+    } */
 
 
 }
