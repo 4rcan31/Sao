@@ -8,10 +8,4 @@ class IndexController extends BaseController{
         view('index');
     }
 
-
-    public function showUsers($id){
-        $id = 12;
-        $res = model('exampleModel')->getUserById($id);
-        res($res);
-    }
 }

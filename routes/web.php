@@ -2,7 +2,3 @@
 
 
 
-Router::get('/', function(){
-
-    controller();
-});
