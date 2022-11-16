@@ -11,16 +11,19 @@ class Request{
     public $path;
 
     
-
+  
 
 
      public static function capture(){
-        
         self::$method = $_SERVER["REQUEST_METHOD"];
-        self::$uri = (parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+        self::$uri = (parse_url('/'.trim($_SERVER["REQUEST_URI"], '/'), PHP_URL_PATH));
         //$this->path = $path;
 
        // echo 'HOLAAAAAAAAA, SI ME ESTOY EJECUTANDO, NO SE QUE PUERCAS ME PASAAAAAAA<br>';
+    }
+
+    public static function uri(){
+        return self::$uri;
     }
 
 

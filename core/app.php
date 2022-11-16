@@ -20,7 +20,7 @@ class App{
         $this->runAppRouting();
        
         $this->runAppApp();
-        $this->runAppApi();
+        $this->runAppWeb();
     }
     //End Autoloader
 
@@ -73,8 +73,8 @@ class App{
     //End App App
 
 
-    private function runAppApi(){
-        include($this->path.'/routes/api.php'); 
+    private function runAppWeb(){
+        include($this->path.'/routes/web.php'); 
         Router::run();
     }
 
