@@ -223,9 +223,4 @@ En el dado caso que requieras un archivo que no este en `app/Views', puedes defi
 
 MIT
 
-<<<<<<< HEAD
-=======
-**Free Software, Hell Yeah!**
-
->>>>>>> 56e14d9449002bad52c911d24eac60a80ebb1946
 
