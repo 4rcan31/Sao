@@ -2,7 +2,7 @@
 
 
 
-class App{
+class Sao{
     protected $path;
 
     function __construct($path){
@@ -14,11 +14,8 @@ class App{
         $this->runAppAutoloaderComposer();
         $this->runAppConfig();
         $this->runAppHelpers();
-
-        
         $this->runAppHttp();
         $this->runAppRouting();
-       
         $this->runAppApp();
         $this->runAppWeb();
     }

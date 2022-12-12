@@ -9,7 +9,7 @@ require_once 'inc/boostrap.php';
 
 
 
-$app->run();
+$sao->run();
 
 
 
