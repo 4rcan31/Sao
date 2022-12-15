@@ -11,6 +11,7 @@ class Sao{
 
     //Start Autoloader
     public function run(){
+        $this->runAppMiddlewares();
         $this->runAppAutoloaderComposer();
         $this->runAppConfig();
         $this->runAppHelpers();
@@ -40,6 +41,9 @@ class Sao{
     }
     //End app Http
 
+    private function runAppMiddlewares(){
+        include($this->path.'/core/middlewares/middlewares.php');
+    }
     private function runAppRouting(){
         include($this->path.'/core/Routing/router.php');
        // $Route = new Router($this->path);
@@ -74,6 +78,8 @@ class Sao{
         include($this->path.'/routes/web.php'); 
         Router::run();
     }
+
+
 
 
     //Composer start app

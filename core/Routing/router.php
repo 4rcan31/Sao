@@ -26,7 +26,7 @@ class Router extends Request{
     }
 
 
-     public static function get($uri, $callable){
+    public static function get($uri, $callable){
         self::add($uri, 'GET', $callable);
     }
     public static function post($uri, $callable){
@@ -60,11 +60,13 @@ class Router extends Request{
     private static function runAction($action) {
         if($action instanceof \Closure){
             $action(request()->data());
-        }else{
+        }
+        
+        /* else{
             $params = explode('@', $action);
             $obj = new $params[0];
             $obj->{$params[1]}();
-        }
+        } */
     }
 
 
