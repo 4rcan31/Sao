@@ -1,6 +1,5 @@
 <?php
-
-
+import('server', false);
 //Files App
 //Devuelve un array con todas las carpetas que exiten en $path, en el caso de no haber archivos en esa carpeta devuelve false.
 
@@ -40,7 +39,6 @@ function getFilesByDirectory($dir){
         }
         closedir($handler);
     }
-
     return $dirs;
 }
 //End Files App
@@ -58,9 +56,25 @@ function Hasher(){
 
 //end
 
-function controller($controller, $function, $model,  $data =[], $imports = []){
+//Request App
+
+function request(){
+    return new Request;
+}
+//end
+
+//server App
+
+function server(){
+    return new Server;
+}
+//end
+
+function controller($controller, $function, $model = '',  $data =[], $imports = []){
     include(dirname(__DIR__, 2).'/app/Controllers/'.$controller.".php");
-    include(dirname(__DIR__, 2).'/app/Models/'.$model.".php");
+    if(!empty($model)){
+        include(dirname(__DIR__, 2).'/app/Models/'.$model.".php");
+    }
     try {
         if(empty($imports)){
             $controller = new $controller;
@@ -77,18 +91,40 @@ function controller($controller, $function, $model,  $data =[], $imports = []){
         return true;
     } catch (\Throwable $th) {
         return false;
+    }    
+}
+
+
+
+
+
+
+
+function import($Modulo, $return = true, $importRoute = 'local' ){
+    if($importRoute == 'local'){
+        $rute = dirname(__DIR__, 2).'/core/'.$Modulo;
+    }else{
+        $rute = $importRoute;
     }
 
+    $files = getFilesByDirectory($rute);
+    if(file_exists($rute)){
+        foreach($files as $file){
+            require_once $rute."/".$file;
+        }
+        if($return){
+            return new $Modulo;
+        }
+    }else{
+        echo '<br><b>Error: </b> No module named "'.$Modulo.'"'."\n";
+        
+    }
 
-
-
-    
 }
 
 function view($html, $route = '', $format = 'php'){
     try {
-        include(dirname(__DIR__, 2).'/core/Views/core.php');
-        include(dirname(__DIR__, 2).'/core/Views/html.php');
+        import('Views', false);
         if(empty($route)){
             include(dirname(__DIR__, 2).'/app/Views/'.$html.'.'.$format);
         }else{
@@ -98,37 +134,11 @@ function view($html, $route = '', $format = 'php'){
     } catch (\Throwable $th) {
         return false;
     }
-
-  
 }
 
 
-function import($Modulo, $importRoute = 'local' ){
-    if($importRoute == 'local'){
-        $rute = dirname(__DIR__, 2).'/core/'.$Modulo;
-    }else{
-        //$rute = $config[''];
-    }
 
-    $files = getFilesByDirectory($rute);
-    if(file_exists($rute)){
-        foreach($files as $file){
-            require_once $rute."/".$file;
-        }
-        return new $Modulo;
-    }else{
-        echo '<br><b>Error: </b> No module named "'.$Modulo.'"'."\n";
-        
-    }
 
-}
-
-//Request App
-
-function request(){
-    return new Request;
-}
-//end
 
 
 function prettyPrint($array){
@@ -160,13 +170,3 @@ function readTxt($name){
     $contenido_fichero = fread($fichero_texto, filesize($name));
     return $contenido_fichero;
 }
-
-
-
-
-
-
-
-
-
-

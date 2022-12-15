@@ -46,14 +46,13 @@ function h1($p, $attributes = []){
     echo add($p, 'link', $attributes);
  }
 
-
+ function title($title){
+   echo '<title>'.$title.'</title>';
+ }
 
  function newHtml($p, $name, $attributes = []){
     echo add($p, $name, $attributes);
  }
-
-
-
 
 
 

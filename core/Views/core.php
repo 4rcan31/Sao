@@ -1,5 +1,4 @@
 <?php 
-
 function add($p, $etiqueta, $attributes = []){
     if($p == 's'){
         return '<'.$etiqueta." ".attributes($attributes).'>';
@@ -26,7 +25,7 @@ function attributes($attributes = []){
 }
 
 
-function headRemast($title, $requires = [], $charter = 'UTF-8', $httpEquiv ='X-UA-Compatible'){
+function headRemast($requires = [], $charter = 'UTF-8', $httpEquiv ='X-UA-Compatible'){
     echo '<head>';
     echo        '<meta charset="'.$charter.'">';
     echo        '<meta http-equiv="'.$httpEquiv.'" content="IE=edge">';
@@ -35,9 +34,7 @@ function headRemast($title, $requires = [], $charter = 'UTF-8', $httpEquiv ='X-U
     if(!empty($requires)){
         echo        '<link '.implode($requires).'>';
     }
-    
-
-    echo       ' <title>'.$title.'</title>';
+    //echo       ' <title>'.$title.'</title>';
     echo   '</head>';
 }
 
@@ -46,12 +43,22 @@ function requires(array $requires){
     for($i = 0; $i < count($requires); $i++){
         $format = format($requires[$i]);
         if($format == "ico"){
-             array_push($arrayRequires, 'rel="icon" href="'.$requires[$i].'"');
+             array_push($arrayRequires, '<link rel="icon" href="'.$requires[$i].'" />');
         }else if($format == "css"){
-            array_push($arrayRequires, 'rel="stylesheet" href="'.$requires[$i].'"');
+            array_push($arrayRequires, '<link rel="stylesheet" href="'.$requires[$i].'" />');
         }else if($format == 'js'){
-            array_push($arrayRequires, 'src="'.$requires[$i].'"');
+            array_push($arrayRequires, '<script src="'.$requires[$i].'" ></script>');
         }
     }
     return $arrayRequires;
+ }
+
+
+ function requiresStaticFiles($files = []){
+    echo implode(requires($files));
+}
+
+
+ function routePublic($route){
+    return server()->RouteAbsolute($route);
  }
