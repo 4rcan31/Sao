@@ -21,10 +21,14 @@ class Request{
 
 
     public function data(){
-        if(self::$method == 'GET'){
-            return $this->dataGET('ESTA ES UNA RUTA XD');
-        }else{
-            return $this->dataMethod();
+        $server = import('server/server.php', true, '/core');
+        $headers = $server->getallheaders();
+        if(isset($headers['Content-Type'])){
+            if($headers['Content-Type'] === 'application/json'){
+                return json_decode(file_get_contents("php://input"));
+            }else{
+                return $_REQUEST;
+            }
         }
     }
 

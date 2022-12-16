@@ -16,7 +16,6 @@ class Response extends Request{
                 header($httpHeader);
             }
         }
- 
         echo $data;
        // exit;
     }
