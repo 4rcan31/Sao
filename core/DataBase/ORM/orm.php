@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__DIR__, 3).'/core/DataBase/connection.php';
+import('DataBase/connection.php', false, '/core');
 
 
 class ORM extends Connection{
@@ -81,16 +81,23 @@ class ORM extends Connection{
       return $this->execute($query, $data);  
     }
 
-    public function runSQL(){
+    public function sql(){
         
-        if($this->query['select'] != ''){
-            $this->constructor();
-            if($this->data['campo'] != ''){
-                $return = $this->execute($this->query, [$this->data['campo']])->fetchAll(PDO::FETCH_ASSOC);
-            }else{
-                $return = $this->execute($this->query)->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            if($this->query['select'] != ''){
+                $this->constructor();
+                if($this->data['campo'] != ''){
+                    $return = $this->execute($this->query, [$this->data['campo']])->fetchAll(PDO::FETCH_OBJ);
+                }else{
+                    $return = $this->execute($this->query)->fetchAll(PDO::FETCH_OBJ);
+                }
+               
             }
-           
+            if(count($return) == 1){
+                $return = $return[0];
+            }
+        } catch (\Throwable $th) {
+            echo "hubo un error";
         }
         return $return;
     }
