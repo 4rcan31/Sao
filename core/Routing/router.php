@@ -16,6 +16,10 @@ class Router extends Request{
         'DELETE' => []
     ];
 
+    private static $middlewares = [
+
+    ];
+
 
     public static function add($uri, $method, $action = null) {
         array_push(Router::$routes[$method], '/' . trim($uri, '/'));
@@ -70,5 +74,20 @@ class Router extends Request{
     }
 
 
+    static public function middleware($route, $middlewares = []){
+        $withoutAuthorization = false;
+        foreach($middlewares as $middleware){
+            if($middleware == false){
+                $withoutAuthorization = true;
+                break;
+            }
+        }
+        if($withoutAuthorization){
+            res(['err'=>'acceso denegado']);
+            die;
+        }
+        $route; //No se por que esto funciona sin definir $route ._.XD
+    }
+    
 }
 ?>
