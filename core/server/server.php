@@ -20,15 +20,15 @@ class Server
     //recibe como parametro una ip y devuelve un array con infomacion de esta.
     function InfoIp($ip)
     {
-        if($ip != 0){
+        if ($ip != 0) {
             $ch = curl_init('http://ipwhois.app/json/' . $ip);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $json = curl_exec($ch);
             curl_close($ch);
-    
+
             // Decode JSON response
             $ipwhois_result = json_decode($json, true);
-    
+
             $Pais = $ipwhois_result['country'];
             $TimeZone  = $ipwhois_result['timezone'];
             $Region = $ipwhois_result['region'];
@@ -39,10 +39,10 @@ class Server
             $ISP = $ipwhois_result['isp'];
             $Ciudad = $ipwhois_result['city'];
             $Moneda = $ipwhois_result['currency'];
-    
+
             $Datos = array($Pais, $TimeZone, $Region, $Continente, $PrefijoPais, $Latitud, $Longitud, $ISP, $Ciudad, $Moneda);
-        }else{
-            $Datos = array(false, "La ip: ".$ip." es 0");
+        } else {
+            $Datos = array(false, "La ip: " . $ip . " es 0");
         }
 
 
@@ -90,7 +90,7 @@ class Server
             $ipAddress = $_SERVER['HTTP_FORWARDED'];
         } else if (!empty($_SERVER['REMOTE_ADDR']) && $this->validateIp($_SERVER['REMOTE_ADDR'])) {
             $ipAddress = $_SERVER['REMOTE_ADDR'];
-        }else{
+        } else {
             $ipAddress = 0;
         }
         return $ipAddress;
@@ -104,24 +104,61 @@ class Server
         return true;
     }
 
-    function RouteAbsolute2($route, $formato){
-        if($formato == "php"){
-            if(empty($_SERVER['DOCUMENT_ROOT'])){
-                $LINK = __DIR__."\\";
-            }else{
-                $LINK = $_SERVER['DOCUMENT_ROOT']."\\";
+    function RouteAbsolute2($route, $formato)
+    {
+        if ($formato == "php") {
+            if (empty($_SERVER['DOCUMENT_ROOT'])) {
+                $LINK = __DIR__ . "\\";
+            } else {
+                $LINK = $_SERVER['DOCUMENT_ROOT'] . "\\";
             }
-        }else{
-            $LINK = (stripos($_SERVER['SERVER_PROTOCOL'],'https') === true ? 'https://' : 'https://').$_SERVER['HTTP_HOST']."/";
+        } else {
+            $LINK = (stripos($_SERVER['SERVER_PROTOCOL'], 'https') === true ? 'https://' : 'https://') . $_SERVER['HTTP_HOST'] . "/";
         }
 
-        return $LINK.$route;
+        return $LINK . $route;
     }
 
-    function RouteAbsolute($route){
-            $protocol = $_SERVER['REQUEST_SCHEME']."://";
-            $domain = $_SERVER['HTTP_HOST'];
-            return $protocol.$domain."/".$route;
-           // return $LINK.$route;
+    function RouteAbsolute($route)
+    {
+        $protocol = $_SERVER['REQUEST_SCHEME'] . "://";
+        $domain = $_SERVER['HTTP_HOST'];
+        return $protocol . $domain . "/" . $route;
+        // return $LINK.$route;
+    }
+
+    function getallheaders(){
+        $headers = array();
+
+        $copy_server = array(
+            'CONTENT_TYPE'   => 'Content-Type',
+            'CONTENT_LENGTH' => 'Content-Length',
+            'CONTENT_MD5'    => 'Content-Md5',
+        );
+
+        foreach ($_SERVER as $key => $value) {
+            if (substr($key, 0, 5) === 'HTTP_') {
+                $key = substr($key, 5);
+                if (!isset($copy_server[$key]) || !isset($_SERVER[$key])) {
+                    $key = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', $key))));
+                    $headers[$key] = $value;
+                }
+            } elseif (isset($copy_server[$key])) {
+                $headers[$copy_server[$key]] = $value;
+            }
         }
+
+        if (!isset($headers['Authorization'])) {
+            if (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+                $headers['Authorization'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+            } elseif (isset($_SERVER['PHP_AUTH_USER'])) {
+                $basic_pass = isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : '';
+                $headers['Authorization'] = 'Basic ' . base64_encode($_SERVER['PHP_AUTH_USER'] . ':' . $basic_pass);
+            } elseif (isset($_SERVER['PHP_AUTH_DIGEST'])) {
+                $headers['Authorization'] = $_SERVER['PHP_AUTH_DIGEST'];
+            }
+        }
+
+        return $headers;
+    }
 }
