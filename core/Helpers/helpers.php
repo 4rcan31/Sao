@@ -1,9 +1,8 @@
 <?php
-import('server', false);
+import('server', false, '/core');
 //Files App
 //Devuelve un array con todas las carpetas que exiten en $path, en el caso de no haber archivos en esa carpeta devuelve false.
 
-use function PHPSTORM_META\type;
 
 function showFiles($path){
     $dir = opendir($path);
@@ -43,19 +42,6 @@ function getFilesByDirectory($dir){
 }
 //End Files App
 
-
-
-//Encrypt start
-function Encrypt(){
-    return new Encrypt;
-}
-
-function Hasher(){
-    return new Hasher;
-}
-
-//end
-
 //Request App
 
 function request(){
@@ -71,9 +57,9 @@ function server(){
 //end
 
 function controller($controller, $function, $model = '',  $data =[], $imports = []){
-    include(dirname(__DIR__, 2).'/app/Controllers/'.$controller.".php");
+    import('controllers/'.$controller.'.php', false);
     if(!empty($model)){
-        include(dirname(__DIR__, 2).'/app/Models/'.$model.".php");
+        import('models/'.$model.'.php', false);
     }
     try {
         if(empty($imports)){
@@ -97,49 +83,45 @@ function controller($controller, $function, $model = '',  $data =[], $imports = 
 
 
 
-
-
-
-function import($Modulo, $return = true, $importRoute = 'local' ){
-    if($importRoute == 'local'){
-        $rute = dirname(__DIR__, 2).'/core/'.$Modulo;
-    }else{
-        $rute = $importRoute;
-    }
-
-    $files = getFilesByDirectory($rute);
-    if(file_exists($rute)){
-        foreach($files as $file){
-            require_once $rute."/".$file;
+function import($module, $return = true, $route = '/app', $data = []){
+    $dir = dirname(__DIR__,2).'/'.trim($route, '/').'/'.$module;
+    if(file_exists($dir)){
+        if(is_dir($dir)){
+            $files = getFilesByDirectory($dir);
+            foreach($files as $file){
+                require_once $dir.'/'.$file;
+            }
+        }else if(is_file($dir)){
+            require_once  $dir;
+            if($return){
+                $module = deleteFormat(lastDir($dir));
+                return new $module($data);
+            }
+        }else{
+            echo '<br><b>Error: </b> No module named "'.$dir.$module.'"'."\n";
         }
-        if($return){
-            return new $Modulo;
-        }
     }else{
-        echo '<br><b>Error: </b> No module named "'.$Modulo.'"'."\n";
-        
+        echo '<br><b>Error: </b> No module named "'.$dir.$module.'"'."\n";
     }
+}
 
+function core($module, $return = true, $data = []){
+    return import($module, $return, '/core', $data);
 }
 
 function view($html, $route = '', $format = 'php'){
     try {
-        import('Views', false);
+        import('Views', false, '/core');
         if(empty($route)){
-            include(dirname(__DIR__, 2).'/app/Views/'.$html.'.'.$format);
+            import("Views/$html.$format", false);
         }else{
-            include(dirname(__DIR__, 2).'/'.$route.'/'.$html.".".$format);
+            import("$route/$html.$format", false, '/');
         }
         return true;
     } catch (\Throwable $th) {
         return false;
     }
 }
-
-
-
-
-
 
 function prettyPrint($array){
     echo '<pre>';
@@ -148,8 +130,8 @@ function prettyPrint($array){
 }
 
 
-function model($nameClass){
-    return new $nameClass;
+function model($modelName){
+    return import('Models/'.$modelName.".php");
 }
 
 
@@ -162,6 +144,14 @@ function format($file){
     return  explode(".", $file)[count(explode(".", $file)) - 1];
 }
 
+function lastDir($file){
+    return  explode("/", $file)[count(explode("/", $file)) - 1];
+}
+
+function deleteFormat($file){
+    return  explode(".", $file)[count(explode(".", $file)) - 2];
+}
+
 function readTxt($name){
     //abrimos el archivo de texto y obtenemos el identificador
     $fichero_texto = fopen ($name, "r");
@@ -169,4 +159,8 @@ function readTxt($name){
     //OJO! Debido a filesize(), sólo funcionará con archivos de texto
     $contenido_fichero = fread($fichero_texto, filesize($name));
     return $contenido_fichero;
+}
+
+function validate($data){
+    return import('validate/validate.php', true, '/core', $data);
 }
