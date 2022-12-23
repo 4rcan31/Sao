@@ -11,13 +11,13 @@ class Sao{
 
     //Start Autoloader
     public function run(){
+        $this->runAppHelpers();
         $this->runAppAutoloaderComposer();
         $this->runAppConfig();
-        $this->runAppHelpers();
         $this->runAppHttp();
         $this->runAppRouting();
         $this->runAppApp();
-        $this->runAppWeb();
+        $this->runAppRoutes();
     }
     //End Autoloader
 
@@ -29,24 +29,24 @@ class Sao{
         $this->runAppCookies();
     }
     private function runAppRequest(){
-        include($this->path.'/core/Http/request.php');
+        import('Http/request.php', false, '/core');
         request()->capture();
     }
     private function runAppReponse(){
-        include($this->path.'/core/Http/reponse.php');
+        import('Http/reponse.php', false, '/core');
     }
     private function runAppCookies(){
-        include($this->path.'/core/Http/cookies.php');
+        import('Http/cookies.php', false, '/core');
     }
     //End app Http
 
     private function runAppRouting(){
         import('middlewares', false);
-        include($this->path.'/core/Routing/router.php');
+        import('Routing/router.php', false, '/core');
     }
 
     private function runAppConfig(){
-        include($this->path.'/Config/app.php');
+        import('app.php', false, '/Config');
     }
 
     private function runAppHelpers(){
@@ -60,18 +60,16 @@ class Sao{
         $this->runAppModel();
     }
     private function runAppController(){
-       include($this->path.'/core/Controller/baseController.php');
-    
+        import('Controller/baseController.php', false, '/core');
     }
     private function runAppModel(){
-        include($this->path.'/core/DataBase/ORM/orm.php'); //Esto no estoy muy seguro si es optimo, por que implica llamar al orm en cada peticion 
-        include($this->path.'/core/Model/baseModel.php');
+      //  include($this->path.'/core/DataBase/ORM/orm.php'); //Esto no estoy muy seguro si es optimo, por que implica llamar al orm en cada peticion 
+        import('Model/baseModel.php', false, '/core');
     }
     //End App App
 
-
-    private function runAppWeb(){
-        include($this->path.'/routes/web.php'); 
+    private function runAppRoutes(){
+        import('routes', false, '/');
         Router::run();
     }
 
@@ -80,7 +78,7 @@ class Sao{
 
     //Composer start app
     private function runAppAutoloaderComposer(){
-        include($this->path.'/vendor/autoload.php');
+        import('autoload.php', false, '/vendor');
         $this->runAppVendorDotenv();
     }
 
