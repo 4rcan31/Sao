@@ -56,7 +56,7 @@ function server(){
 }
 //end
 
-function controller($controller, $function, $model = '',  $data =[], $imports = []){
+function controller($controller, $function,  $data =[], $model = '', $imports = []){
     import('controllers/'.$controller.'.php', false);
     if(!empty($model)){
         import('models/'.$model.'.php', false);
@@ -135,9 +135,9 @@ function model($modelName){
 }
 
 
-function res($response, $errorResponseBody = null, $errorResponseHeader = null){
+function res($response, $code = 200, $errorResponseBody = null, $errorResponseHeader = null){
     $res = new Response;
-    $res->res($response, $errorResponseBody, $errorResponseHeader);
+    $res->res($response,$code, $errorResponseBody, $errorResponseHeader);
 }
 
 function format($file){
@@ -163,4 +163,16 @@ function readTxt($name){
 
 function validate($data){
     return import('validate/validate.php', true, '/core', $data);
+}
+
+function jwt(){
+    return import('Session/JwtSession.php', true, '/core');
+}
+
+function sortIndex($array){
+    $return = [];
+    foreach($array as $value){
+        array_push($return, $value);
+    }
+    return $return;
 }
