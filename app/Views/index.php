@@ -1,5 +1,5 @@
 <?php
-
+layouts();
 inithtml();
 
 
@@ -17,6 +17,9 @@ headRemast('Home', requires([
             print('Esto es un h1');
         h1('e');
     div('e');
+
+
+    example('Esto es un h2', 'h2');
 
 
 
