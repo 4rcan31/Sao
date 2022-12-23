@@ -161,4 +161,26 @@ class Server
 
         return $headers;
     }
+
+    public function getCookies($index = null){
+        $return = [];
+        if(isset($this->getallheaders()['Cookie']) || !empty($this->getallheaders()['Cookie'])){
+            $cookies = $this->getallheaders()['Cookie'];
+            $cookies = explode(';', $cookies);
+            for($i = 0; count($cookies) > $i; $i++){
+                $cookie = explode('=', $cookies[$i]);
+                $return[$cookie[0]] = $cookie[1];
+            }
+        }else{
+            $return = false;
+        }
+        if(!empty($index)){
+            if(isset($return[$index])){
+                $return = $return[$index];
+            }else{
+                $return = false;
+            }
+        }
+        return $return;
+    }
 }
