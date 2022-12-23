@@ -4,6 +4,7 @@
 class Request{
     public static $method;
     public static $uri;
+    public $data;
 
 
     
@@ -19,14 +20,19 @@ class Request{
         return self::$uri;
     }
 
+    public function getdata(){
+        return $this->data;
+    }
 
     public function data(){
         $server = import('server/server.php', true, '/core');
         $headers = $server->getallheaders();
         if(isset($headers['Content-Type'])){
             if($headers['Content-Type'] === 'application/json'){
+                $this->data = json_decode(file_get_contents("php://input"));
                 return json_decode(file_get_contents("php://input"));
             }else{
+                $this->data = $_REQUEST;
                 return $_REQUEST;
             }
         }
