@@ -1,6 +1,6 @@
 <?php 
 
-require 'core/app.php';
+require dirname(__DIR__).'/core/app.php';
 
 
 $sao = new Sao(
