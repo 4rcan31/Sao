@@ -56,12 +56,13 @@ function server(){
 }
 //end
 
-function controller($controller, $function,  $data =[], $model = '', $imports = []){
-    import('controllers/'.$controller.'.php', false);
-    if(!empty($model)){
-        import('models/'.$model.'.php', false);
-    }
+function controller2($controller, $function,  $data =[], $model = '', $imports = []){
+
     try {
+        import('controllers/'.$controller.'.php', false);
+        if(!empty($model)){
+            import('models/'.$model.'.php', false);
+        }
         if(empty($imports)){
             $controller = new $controller;
         }else{
@@ -76,11 +77,30 @@ function controller($controller, $function,  $data =[], $model = '', $imports = 
 
         return true;
     } catch (\Throwable $th) {
+        echo 'ERROR';
         return false;
     }    
 }
 
+function controller($controller, $function, $data = 'nulldata'){
+   $controller = import('controllers/'.$controller.'.php');
+   if($data == 'nulldata'){
+    try{
+        $controller->{$function}();
+        return;
+    }catch(\Throwable $th){
+        throw new Exception('La funcion '.$function." espera parametros que no fueron definidos.");
+        return;
+    }
+   }else{
+    $controller->{$function}($data);
+    return;
+   }
+}
 
+function objectToArray($object){
+    return json_decode(json_encode($object), true);
+}
 
 
 function import($module, $return = true, $route = '/app', $data = []){
@@ -111,7 +131,8 @@ function core($module, $return = true, $data = []){
 
 function view($html, $route = '', $format = 'php'){
     try {
-        import('Views', false, '/core');
+       // import('Views', false, '/core');
+        core('Views', false);
         if(empty($route)){
             import("Views/$html.$format", false);
         }else{
@@ -123,10 +144,14 @@ function view($html, $route = '', $format = 'php'){
     }
 }
 
-function prettyPrint($array){
-    echo '<pre>';
-    var_dump($array);
-    echo "</pre>";
+function prettyPrint($array, $json = false){
+    if($json){
+        echo json_encode($array);
+    }else{
+        echo '<pre>';
+        var_dump($array);
+        echo "</pre>";
+    }
 }
 
 
@@ -134,10 +159,19 @@ function model($modelName){
     return import('Models/'.$modelName.".php");
 }
 
+function printfa(...$data){
+    $echo = '';
+    for($i = 0; count($data) > $i; $i++){
+        $echo = $echo.$data[$i];
+    }
+    echo $echo."<br>";
+}
+
 
 function res($response, $code = 200, $errorResponseBody = null, $errorResponseHeader = null){
     $res = new Response;
     $res->res($response,$code, $errorResponseBody, $errorResponseHeader);
+    exit;
 }
 
 function format($file){
@@ -175,4 +209,19 @@ function sortIndex($array){
         array_push($return, $value);
     }
     return $return;
+}
+
+function randomString($length){
+    $rand_string = '';
+    for($i = 0; $i < $length; $i++) {
+        $number = random_int(0, 36);
+        $character = base_convert($number, 10, 36);
+        $rand_string .= $character;
+    }
+    return $rand_string;
+}
+
+
+function auth(){
+    return core('Session/auth.php');
 }
