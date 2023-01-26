@@ -3,104 +3,199 @@ import('DataBase/connection.php', false, '/core');
 
 
 class ORM extends Connection{
-    public $query = [
-        'select' => '',
-        'where'=> '',
-        'orderBy' => '',
-        'limit' => ''
-    ];
+    public $query = '';
+    public $data = [];
+    public $responseSQL;
+    public $judgmentExecuted;
 
-    public $data = [
-        'table' => '',
-        'method' => '',
-        'params' => '',
-        'colum' => '',
-        'condition' => '',
-        'campo' => '',
-        'limit' => ''
-    ];
 
-    public function select($table, $params = []){
-        $SQL = null;
-        if(count($params) == 0){
-            $SQL = 'SELECT * FROM '.$table;
-        }else{
-            $SQL = "SELECT ".implode(", ",$params)." FROM ".$table;
-            $this->data['params'] = $params;
+    public function prepare(){
+        $this->query = '';
+        $this->data = [];
+    }
+
+    public function select($colums = [], $all = true){
+        empty($colums) ?  $query = 'SELECT ' : $query = 'SELECT '.implode(',', $colums);
+        $this->query = $this->query." ".$query;
+        return $this;
+    } 
+
+    public function join(string $table){
+        $this->query = $this->query." JOIN ".$table;
+        return $this;
+    }
+
+    public function inner(){
+        $this->query = $this->query." INNER ";
+        return $this;
+    }
+
+    public function left(){
+        $this->query = $this->query." LEFT ";
+        return $this;
+    }
+
+    public function right(){
+        $this->query = $this->query." RIGHT ";
+        return $this;
+    }
+
+    public function full(){
+        $this->query = $this->query." FULL ";
+        return $this;
+    }
+
+    public function on($field1, $field2, $condition = '='){
+        $this->query = $this->query." ON $field1 $condition $field2";
+        return $this;
+    }
+
+    public function from($table){
+        $query = ' FROM '.$table;
+        $this->query = $this->query.$query;
+        return $this;
+    }
+
+    public function where($colum, $field, $condition = '='){
+        $query = ' WHERE '.$colum." ".$condition." ?";
+        array_push($this->data, $field);
+        $this->query = $this->query.$query;
+        return $this;
+    }
+    public function and($colum, $field, $condition = "="){
+        $this->condition('AND', $colum, $field, $condition);
+        return $this;
+    }
+    public function or($colum, $field, $condition = "="){
+        $this->condition('OR', $colum, $field, $condition);
+        return $this;
+    }
+
+    public function not($colum, $field, $condition = "="){
+        $this->condition('NOT', $colum, $field, $condition);
+        return $this;
+    }
+
+    public function condition($sqlCondition, $colum, $field, $condition = "="){
+        $this->query = $this->query." $sqlCondition ".$colum.$condition." ?";
+        array_push($this->data, $field);
+    }
+
+    public function insert(String $table){
+        $this->query = $this->query." INSERT INTO ".$table;
+        return $this;
+    }
+
+    public function values(Array $datos = []){
+        if(empty($datos)){
+            throw new Exception('You have not specified the data.');
+            return false;
         }
-        $this->query['select'] = $this->query['select'].$SQL;
-        $this->data['table'] = $table;
+        $columsInsert = []; $p = '';
+        foreach($datos as $colums => $values){
+            array_push($this->data, $values);
+            array_push($columsInsert, $colums);
+            $p = $p . "?, ";
+        }
+        $query = "(".implode(', ', $columsInsert).") VALUES (".trim(trim($p), ',').")";
+        $this->query = $this->query.$query;
+    }
+
+    public function count($colums = []){
+        if(empty($colums)){
+            $query = ' COUNT(*)';
+        }else{
+            if(is_array($colums)){
+                $query = 'COUNT('.implode(', ', $colums).')';
+            }else{
+                $query = 'COUNT('.$colums.')';
+            }
+        }
+        $this->query = $this->query.$query;
         return $this;
     }
-    public function orderBy($method = "ASC"){
-        $this->query['orderBy'] = $this->query['orderBy']." ORDER BY '$method'";
-        $this->data['method'] = $method;
+
+    public function update(String $table, Array $datos = []){
+        if(empty($datos)){
+            throw new Exception('You have not specified the data.');
+            return false;
+        }
+        $query = " UPDATE ".$table." SET ";
+        $updateData = ' ';
+        foreach($datos as $colums => $values){
+            array_push($this->data, $values);
+            $updateData = $updateData." ".$colums." = ?";
+        }
+        $query = $query.$updateData;
+        $this->query = $this->query.$query;
         return $this;
     }
-  
-  public function where($colum, $condition, $campo){
-      $SQL = " WHERE $colum $condition ?";
-      $this->query['where'] = $this->query['where'].$SQL;
-      $this->data['colum'] = $colum;
-      $this->data['condition'] = $condition;
-      $this->data['campo'] = $campo;
-      
-    return $this;
-  }
 
-  public function limit($limit = 1000){
-        $SQL = " LIMIT $limit";
-        $this->query['limit'] = $this->data['limit'].$SQL;
-        $this->data['limit'] = $limit;
-  }
-
-    public function constructor(){
-        $appsql = new $this;
-        $appsql->select($this->data['table']);
-        $appsql->orderBy($this->data['method']);
-        $appsql->where($this->data['colum'], $this->data['condition'], $this->data['campo']);
-        $appsql->limit($this->data['limit']);
-        $this->query = implode($this->query);
+    public function delete(String $table){
+        $query = ' DELETE FROM '.$table;
+        $this->query = $this->query.$query;
+        return $this;
     }
 
-    public function execute($query, $data = []){
-        $res = $this->connection->prepare($query);
-        if($res){
-                 if($res->execute($data)){
-                    return $res;
-                 }else{
-                    throw New Exception("Unable to do execute statement: " . $query." and the data: ". json_encode($data));
-                 }
-            
+    public function queryString(){
+        return [
+            'queryStrig' => $this->query,
+            'data' => $this->data
+        ];
+    }
+
+
+    public function query(String $query, $data){
+        return $this->executeSql($query, $data);
+    }
+
+    public function executeSql(String $query, $data){
+        $responseSQL = $this->connection->prepare($query);
+        if($responseSQL){
+            if($responseSQL->execute($data)){
+                return $responseSQL;
+            }else{
+                throw New Exception("Unable to do execute statement: " . $query." and the data: ". json_encode($data));
+                return false;
+            }
         }else{
             throw New Exception("Unable to do prepared statement: " . $query);
+            return false;
         }
     }
 
-    public function query($query, $data = []){
-      return $this->execute($query, $data);  
-    }
 
-    public function sql(){
-        
-        try {
-            if($this->query['select'] != ''){
-                $this->constructor();
-                if($this->data['campo'] != ''){
-                    $return = $this->execute($this->query, [$this->data['campo']])->fetchAll(PDO::FETCH_OBJ);
-                }else{
-                    $return = $this->execute($this->query)->fetchAll(PDO::FETCH_OBJ);
-                }
-               
-            }
-            if(count($return) == 1){
-                $return = $return[0];
-            }
-        } catch (\Throwable $th) {
+    public function execute(){
+        try{
+        $this->responseSQL = $this->query($this->query, $this->data);
+        return $this;
+        }catch (\Throwable $th) {
             echo "hubo un error";
+            echo $th;
         }
-        return $return;
     }
 
+    public function all($type = 'fetch'){
+        if($type == 'fetch'){
+            return $this->responseSQL->fetch(PDO::FETCH_ASSOC);
+        }else if($type == 'fetchAll'){
+            return $this->responseSQL->fetchAll(PDO::FETCH_ASSOC);
+        }
+    }
 
+    public function fetchColum(){
+        return $this->responseSQL->fetchColumn();
+    }
+
+    public function exist(){
+        $res = $this->all();
+        if($res === false){
+            return false;
+        }   
+        return true;
+    }
+
+    public function lastId(){
+        return $this->connection->lastInsertId(); //No entiendo muy bien por que esta funcion nesesita la conexion y no la respuesta sql como las demas funciones
+    }
 }
