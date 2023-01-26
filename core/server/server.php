@@ -119,9 +119,12 @@ class Server
         return $LINK . $route;
     }
 
-    function RouteAbsolute($route)
-    {
-        $protocol = $_SERVER['REQUEST_SCHEME'] . "://";
+    function RouteAbsolute($route){
+        $protocol = 'https';
+        if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') {
+            $protocol = "http";
+        }
+        $protocol = $protocol . "://";
         $domain = $_SERVER['HTTP_HOST'];
         return $protocol . $domain . "/" . $route;
         // return $LINK.$route;
