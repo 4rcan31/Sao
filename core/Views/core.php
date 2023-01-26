@@ -38,7 +38,7 @@ function headRemast($requires = [], $charter = 'UTF-8', $httpEquiv ='X-UA-Compat
     echo   '</head>';
 }
 
-function requires(array $requires){
+function requires(array $requires, string $type = 'text/javascript'){
     $arrayRequires =[]; 
     for($i = 0; $i < count($requires); $i++){
         $format = format($requires[$i]);
@@ -47,18 +47,35 @@ function requires(array $requires){
         }else if($format == "css"){
             array_push($arrayRequires, '<link rel="stylesheet" href="'.$requires[$i].'" />');
         }else if($format == 'js'){
-            array_push($arrayRequires, '<script src="'.$requires[$i].'" ></script>');
+            array_push($arrayRequires, '<script type="'.$type.'" src="'.$requires[$i].'" ></script>');
         }
     }
     return $arrayRequires;
  }
 
 
- function requiresStaticFiles($files = []){
-    echo implode(requires($files));
+ function requiresStaticFiles($files = [], string $type = 'text/javascript'){
+    echo implode(requires($files, $type));
 }
 
 
  function routePublic($route){
     return server()->RouteAbsolute($route);
  }
+
+ function routeAppPublic($route){
+    return server()->RouteAbsolute("app/".$route);
+ }
+
+
+ function requireCore(){
+    requiresStaticFiles([
+        routePublic('core/document.js'),
+        routePublic('core/touch.js'),
+        routePublic('core/send.js'),
+        routePublic('core/cookies.js'),
+        routePublic('core/server.js'),
+        routePublic('core/string.js')
+    ]);
+ }
+
