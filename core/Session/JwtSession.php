@@ -16,12 +16,18 @@ class JwtSession{
         return $jwt;
     }
     public function decodeJwt($jwt, $encrypter = true, $algori='HS256'){
-        $key = $_ENV['KEY'];
-        if($encrypter){
-            $encrypter = core('Encrypt/encrypt.php');
-            $jwt = $encrypter->decrypt($jwt, $key);
+
+        try {
+            $key = $_ENV['KEY'];
+            if($encrypter){
+                $encrypter = core('Encrypt/encrypt.php');
+                $jwt = $encrypter->decrypt($jwt, $key);
+            }
+            $jwt  = JWT::decode($jwt, new Key($key, $algori));
+           return $jwt;
+        } catch (\Throwable $th) {
+            return false;
         }
-        $jwt  = JWT::decode($jwt, new Key($key, $algori));
-       return $jwt;
+
     }
 }
