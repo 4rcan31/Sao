@@ -13,7 +13,6 @@ class Sao{
     public function run(){
         $this->runAppHelpers();
         $this->runAppAutoloaderComposer();
-        $this->runAppConfig();
         $this->runAppHttp();
         $this->runAppRouting();
         $this->runAppApp();
@@ -45,10 +44,6 @@ class Sao{
         import('Routing/router.php', false, '/core');
     }
 
-    private function runAppConfig(){
-        import('app.php', false, '/Config');
-    }
-
     private function runAppHelpers(){
         include($this->path.'/core/Helpers/helpers.php');
     }
@@ -69,8 +64,10 @@ class Sao{
     //End App App
 
     private function runAppRoutes(){
-        import('routes', false, '/');
-        Router::run();
+        Route::group(function(){ // Hay un grupo por default que engloba todas las rutas que se definen por el usuario, esto es por que da error si no lo hago
+            import('routes', false, '/'); //Aca se importan todas las rutas definidas
+        });
+        Route::run(); // Ejecuto la app de ruteo con todas las rutas ya definidas
     }
 
 
@@ -83,8 +80,7 @@ class Sao{
     }
 
     private function runAppVendorDotenv(){
-        $dotenv = Dotenv\Dotenv::createImmutable($this->path);
-        $dotenv->load();
+        Dotenv\Dotenv::createImmutable($this->path)->load(); //Cargo la libreria de Dotenv para leer archivos env
     }
     //Composer end   app
 
