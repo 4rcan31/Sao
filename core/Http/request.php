@@ -25,16 +25,19 @@ class Request{
     }
 
     public function data(){
-        $server = import('server/server.php', true, '/core');
-        $headers = $server->getallheaders();
+        $headers = core('server/server.php')->getallheaders();
         if(isset($headers['Content-Type'])){
             if($headers['Content-Type'] === 'application/json'){
-                $this->data = json_decode(file_get_contents("php://input"));
-                return json_decode(file_get_contents("php://input"));
+                $object = json_decode(file_get_contents("php://input"));
+                $this->data = objectToArray($object);
+                return objectToArray($object);
             }else{
                 $this->data = $_REQUEST;
                 return $_REQUEST;
             }
+        }else{
+            $this->data = $_REQUEST;
+            return $_REQUEST;
         }
     }
 
@@ -47,4 +50,5 @@ class Request{
     }
 
 }
+
 
