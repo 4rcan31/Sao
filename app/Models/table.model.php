@@ -6,7 +6,8 @@ class exampleModel extends BaseModel{
     
 
     public function getUserById($id){
-        $this->select('users');
-        return $this->runSQL();
+        $this->prepare();
+        $this->select(['*'])->from('user')->where('id', $id);
+        $this->execute()->all();
     }
 }

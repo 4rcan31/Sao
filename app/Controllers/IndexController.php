@@ -4,7 +4,7 @@
 class IndexController extends BaseController{
     
 
-    public function home($data){
+    public function home(){
         view('index');
     }
 
