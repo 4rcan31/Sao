@@ -5,6 +5,7 @@
 class Sao{
     protected $path;
 
+
     function __construct($path){
         $this->path = $path;
     }
@@ -29,7 +30,7 @@ class Sao{
     }
     private function runAppRequest(){
         import('Http/request.php', false, '/core');
-        request()->capture();
+        Request::capture();
     }
     private function runAppReponse(){
         import('Http/reponse.php', false, '/core');
