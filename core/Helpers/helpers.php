@@ -102,6 +102,10 @@ function objectToArray($object){
     return json_decode(json_encode($object), true);
 }
 
+function arrayToObject(Array $array){
+    return json_decode(json_encode($array, JSON_FORCE_OBJECT));
+}
+
 
 function import($module, $return = true, $route = '/app', $data = []){
     $dir = dirname(__DIR__,2).'/'.trim($route, '/').'/'.$module;
@@ -132,7 +136,7 @@ function core($module, $return = true, $data = []){
 function view($html, $route = '', $format = 'php'){
     try {
        // import('Views', false, '/core');
-        core('Views', false);
+        core('Views', false); //Importamos todo el core de las vistas
         if(empty($route)){
             import("Views/$html.$format", false);
         }else{
@@ -203,7 +207,7 @@ function jwt(){
     return import('Session/JwtSession.php', true, '/core');
 }
 
-function sortIndex($array){
+function sortIndex($array){ //Ordena los indices de un array
     $return = [];
     foreach($array as $value){
         array_push($return, $value);
@@ -211,7 +215,7 @@ function sortIndex($array){
     return $return;
 }
 
-function randomString($length){
+function randomString($length){ //Genera un string aleatorio
     $rand_string = '';
     for($i = 0; $i < $length; $i++) {
         $number = random_int(0, 36);
@@ -221,7 +225,3 @@ function randomString($length){
     return $rand_string;
 }
 
-
-function auth(){
-    return core('Session/auth.php');
-}

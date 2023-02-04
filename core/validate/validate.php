@@ -61,6 +61,7 @@ class Validate{
         if(isset($this->datos[$index])){
             return $this->datos[$index];
         }
+        echo 'El indice: "'.$index.'" no existe.';
         throw new Exception('El indice: "'.$index.'" no existe.'); 
     }  
 

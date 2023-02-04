@@ -51,6 +51,11 @@ class Route extends Request{
         return new Route($route, 'DELETE', Route::$idRoute);
     }
 
+    public static function root(callable $callable, string $method = 'GET'){
+        Route::addRoute('/', $callable, $method);
+        return new Route('/', $method, Route::$idRoute);
+    }
+
     public function middlewares(Array $middlewares){
         $this->set('middlewares', $middlewares);
         return new Route(Route::$executed, Route::$typeExecuted, Route::$idExecuted);
@@ -198,9 +203,9 @@ class Route extends Request{
                     !empty($middlewares) ? Route::doMiddlewares($middlewares) : null;
                     array_shift($matches); 
                     if(!empty($matches)){
-                        $callback($matches, request()->data()); break;
+                        $callback($matches, Request::$data); break;
                     }else{
-                        $callback(request()->data()); break;
+                        $callback(Request::$data); break;
                     }
                 }else{
                     $err = 405;
