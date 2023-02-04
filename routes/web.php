@@ -2,9 +2,7 @@
 
 //Si quieres ver la url visitada actualmente puedes ejecutar: Request::$uri;
 
-Route::get('/', function(){
-    echo "This is the root";
-});
+
 
 
 
@@ -27,3 +25,11 @@ Route::group(function(){
     });
     
 })->prefix('/public');
+
+
+
+
+
+Route::root(function(){
+    res("This is the root");
+}); 
