@@ -28,13 +28,13 @@ class Request{
 
 
     public static function data(){
-        $dataRequestInput = objectToArray(json_decode(file_get_contents("php://input")));
+        $dataRequestInput = json_decode(file_get_contents("php://input"));
         $dataRequestPhp = $_REQUEST;
         $data = [];
         if(!empty($dataRequestInput) && !empty($dataRequestPhp)){
-            $data = array_merge($dataRequestInput, $dataRequestPhp);
+            $data = array_merge(objectToArray($dataRequestInput), $dataRequestPhp);
         }else if(!empty($dataRequestInput)){
-            $data = $dataRequestInput;
+            $data = objectToArray($dataRequestInput);
         }else if(!empty($dataRequestPhp)){
             $data = $dataRequestPhp;
         }else{
