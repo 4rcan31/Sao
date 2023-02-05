@@ -26,15 +26,15 @@ class Sao{
     //Start app Http
     private function runAppHttp(){
         $this->runAppRequest();
-        $this->runAppReponse();
+        $this->runAppResponse();
         $this->runAppCookies();
     }
     private function runAppRequest(){
         import('Http/request.php', false, '/core');
         Request::capture();
     }
-    private function runAppReponse(){
-        import('Http/reponse.php', false, '/core');
+    private function runAppResponse(){
+        import('Http/response.php', false, '/core');
     }
     private function runAppCookies(){
         import('Http/cookies.php', false, '/core');
