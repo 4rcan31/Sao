@@ -13,6 +13,7 @@ class Sao{
     //Start Autoloader
     public function run(){
         $this->runAppHelpers();
+        $this->runAppSaoHelpers();
         $this->runAppAutoloaderComposer();
         $this->runAppHttp();
         $this->runAppRouting();
@@ -46,8 +47,25 @@ class Sao{
     }
 
     private function runAppHelpers(){
-        include($this->path.'/core/Helpers/helpers.php');
+        include($this->path.'/core/Helpers/files.php');
+        include($this->path.'/core/Helpers/array.php');
+        include($this->path.'/core/Helpers/object.php');
+        include($this->path.'/core/Helpers/string.php');
+        include($this->path.'/core/Helpers/print.php');
     }
+
+    private function runAppSaoHelpers(){
+        include($this->path.'/core/Helpers/sao/import.php');
+        include($this->path.'/core/Helpers/sao/auth.php');
+        include($this->path.'/core/Helpers/sao/controller.php');
+        include($this->path.'/core/Helpers/sao/core.php');
+        include($this->path.'/core/Helpers/sao/model.php');
+        include($this->path.'/core/Helpers/sao/response.php');
+        include($this->path.'/core/Helpers/sao/server.php');
+        include($this->path.'/core/Helpers/sao/validate.php');
+        include($this->path.'/core/Helpers/sao/view.php');
+    }
+
 
 
     //Star App App
