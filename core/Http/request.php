@@ -122,7 +122,7 @@ class Request{
 
 
     public static function getAllCookies(){
-        $cookies = [];
+        $return = [];
         if(isset(Request::getAllHeaders()['Cookie']) || !empty(Request::getAllHeaders()['Cookie'])){
             $cookies = explode(';', Request::getAllHeaders()['Cookie']);
             for($i = 0; count($cookies) > $i; $i++){
@@ -130,7 +130,7 @@ class Request{
                 $return[$cookie[0]] = $cookie[1];
             }
         }
-        return $cookies;
+        return $return;
     }
 
 
