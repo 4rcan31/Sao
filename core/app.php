@@ -17,8 +17,10 @@ class Sao{
         $this->runAppAutoloaderComposer();
         $this->runAppHttp();
         $this->runAppRouting();
+        $this->runAppAuth();
         $this->runAppApp();
         $this->runAppRoutes();
+        exit;
     }
     //End Autoloader
 
@@ -56,7 +58,6 @@ class Sao{
 
     private function runAppSaoHelpers(){
         include($this->path.'/core/Helpers/sao/import.php');
-        include($this->path.'/core/Helpers/sao/auth.php');
         include($this->path.'/core/Helpers/sao/controller.php');
         include($this->path.'/core/Helpers/sao/core.php');
         include($this->path.'/core/Helpers/sao/model.php');
@@ -66,6 +67,10 @@ class Sao{
         include($this->path.'/core/Helpers/sao/view.php');
     }
 
+
+    private function runAppAuth(){
+        core('Auth/auth.php', false); //Esto no se si es eficiente, por que no todos los middlewares requieren de una session
+    }
 
 
     //Star App App
