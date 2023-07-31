@@ -36,6 +36,16 @@ function getFilesByDirectory($dir){
     return $dirs;
 }
 
+function getDirsFilesByDirectory($dir){
+    $return = [];
+    for($i = 0; $i < count(getFilesByDirectory($dir)); $i++){
+        array_push($return, $dir.getFilesByDirectory($dir)[$i]);
+    }
+    return $return;
+}
+
+
+
 
 function showFiles($path){
     $dir = opendir($path);
