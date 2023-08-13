@@ -44,9 +44,6 @@ function getDirsFilesByDirectory($dir){
     return $return;
 }
 
-
-
-
 function showFiles($path){
     $dir = opendir($path);
     if(file_exists($path) && $dir){
@@ -68,4 +65,41 @@ function showFiles($path){
     }else{
         echo "El fichero no existe";
     }
+}
+
+
+function copyDirectory($source, $destination) {
+    if (!is_dir($destination)) {
+        mkdir($destination, 0777, true);
+    }
+
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST
+    );
+
+    foreach ($iterator as $item) {
+        if ($item->isDir()) {
+            mkdir($destination . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+        } else {
+            copy($item, $destination . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+        }
+    }
+}
+
+function deleteDirectory($dir) {
+    if (!is_dir($dir)) {
+        return;
+    }
+    $files = scandir($dir);
+    foreach ($files as $file) {
+        if ($file != '.' && $file != '..') {
+            if (is_dir($dir . DIRECTORY_SEPARATOR . $file)) {
+                deleteDirectory($dir . DIRECTORY_SEPARATOR . $file);
+            } else {
+                unlink($dir . DIRECTORY_SEPARATOR . $file);
+            }
+        }
+    }
+    rmdir($dir);
 }
