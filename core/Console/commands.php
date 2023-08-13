@@ -27,7 +27,7 @@ Jenu::command('make:migration', function($argrs){
     EOT;
     fwrite($file, $content);
             
-    // Fuerza a que se escriban los datos pendientes en el buffer:
+    // Fuerza a que se escriban los datos pendientes en  el buffer:
     fflush($file);
     // Cerrar el archivo:
     fclose($file);
@@ -49,6 +49,10 @@ Jenu::command('execute:migrations', function(){
 });
 
 Jenu::command('migrations:fresh', function(){
+    if(!Jenu::condition("Are you sure that delete all the tables? (type YES or NOT)")){ 
+        Jenu::warn("The migrations fresh was canceled");
+        die;
+    }
     $db = new DataBase;
     $tables = $db->query("SELECT GROUP_CONCAT('`', table_name, '`') AS tables
     FROM information_schema.tables
@@ -62,5 +66,29 @@ Jenu::command('migrations:fresh', function(){
 });
 
 Jenu::command('install', function(){
-    Jenu::print("Welcome to the Sao setup program");
+    Jenu::print('==================================================');
+    Jenu::print("======== Welcome to the Sao setup program ========");
+    Jenu::print('==================================================');
+    Jenu::print("Type the name of the App: ");
+    $sep = DIRECTORY_SEPARATOR;
+    $nameApp = readline();
+    $ruteProject = dirname(Jenu::baseDir()) . $sep . $nameApp . $sep;
+    mkdir($ruteProject, 0777);
+    copyDirectory(Jenu::baseDir(), $ruteProject);
+    foreach(getFilesByDirectory(Jenu::baseDir().$sep."core") as $libsSao){ Jenu::success("Lib '".$libsSao."' was installed"); }
+    Jenu::success("Core Sao was installed");
+    deleteDirectory($ruteProject.$sep.".git");
+    exec("php $ruteProject"."jenu endinstall $nameApp ".Jenu::baseDir(), $output);
+    foreach ($output as $line) {
+        Jenu::print($line);
+    }
+    return;
+});
+
+Jenu::command('endinstall', function($argrs){
+    Jenu::print("In the new project command");
+    $nameApp = $argrs[0];
+    $dirOldApp = $argrs[1];
+    deleteDirectory($dirOldApp);
+    Jenu::success("The project '$nameApp' was created correctily");
 });

@@ -17,6 +17,16 @@ class Jenu{
     public static function getDate(){
         return self::$date;
     }
+
+    public static function baseDir(){
+        return dirname(dirname(__DIR__));
+    }
+
+    public static function condition(string $pront){
+        $response = readline($pront);
+        return $response == 'yes' || $response == 'YES' || $response == "Y" || $response == "y" ?
+        true : false;
+    }
     
 
     public static function print($text){
