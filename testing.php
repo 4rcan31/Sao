@@ -31,6 +31,22 @@ echo Auth::data()->id;
 
 
 
+require __DIR__."/core/DataBase/ORM/orm.php";
+
+
+$db = new DataBase;
+
+
+$prepare = $db->connection()->prepare('query');
+$response = $prepare->execute([]);
+
+
+$db->query('query', []);
+
+
+
+
+
 
 
 
