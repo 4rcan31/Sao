@@ -1,0 +1,9 @@
+<?php
+
+//require __DIR__.'/core/Helpers/helpers.php';
+
+
+
+require 'core/Console/app.php';
+$console = new run(__DIR__, $_SERVER['argv']);
+$console->run();

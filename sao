@@ -1,7 +1,0 @@
-<?php
-
-//require __DIR__.'/core/Helpers/helpers.php';
-require_once __DIR__.'/vendor/autoload.php';
-Dotenv\Dotenv::createImmutable(__DIR__)->load(); //Cargo la libreria de Dotenv para leer archivos env
-require __DIR__.'/core/Helpers/console.php';
-require __DIR__.'/core/Console/console.php';
