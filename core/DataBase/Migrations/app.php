@@ -1,7 +1,7 @@
 <?php 
 
 require "table.php";
-class Migration extends ORM{
+class Migration extends DataBase{
     
     
     public function create(string $nameTable, callable $function){
@@ -12,6 +12,7 @@ class Migration extends ORM{
 
     public function dropIfExist(string $nameTable){
         $table = new Table($nameTable, 'delete');
+      //  return $this->query($table->querySql()); //Se ejecuta la query contruida
         return $table->querySql();
     }
 }

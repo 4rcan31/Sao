@@ -15,7 +15,7 @@ class Table{
     public function __construct($nameTable, $type = ""){
         $this->type = $type;
         $type == 'create' ? $this->sql = $this->sql."CREATE TABLE ".$nameTable." (" : 
-                            $this->sql = $this->sql."SET FOREIGN_KEY_CHECKS=0; DROP TABLE IF EXISTS $nameTable; SET FOREIGN_KEY_CHECKS=0";
+                            $this->sql = $this->sql."SET FOREIGN_KEY_CHECKS=0; DROP TABLE IF EXISTS  `$nameTable`";
     }
 
     public function __destruct(){ //Esta funcion siempre se ejecuta de ultimo

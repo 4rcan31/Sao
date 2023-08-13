@@ -2,12 +2,16 @@
 import('DataBase/connection.php', false, '/core');
 
 
-class ORM extends Connection{
+class DataBase extends Connection{
     public $query = '';
     public $data = [];
     public $responseSQL;
     public $judgmentExecuted;
 
+
+    public function connection(){
+        return $this->connection;
+    }
 
     public function prepare(){
         $this->query = '';
@@ -144,8 +148,8 @@ class ORM extends Connection{
         ];
     }
 
-
-    public function query(String $query, $data){
+    //Esta funcion es la que ejecuta una query
+    public function query(String $query, $data = []){
         return $this->executeSql($query, $data);
     }
 
