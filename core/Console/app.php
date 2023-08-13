@@ -1,67 +1,79 @@
 <?php 
 
 
-class SaoConsole{
+class run{
+
+    protected $path;
+    public array $args;
 
 
 
-    public function doMigration($name){
-        $date = date('D.d.M.Y_H.i.s');
-        $nameFile = explode(".", $name)[0]."_".$date.".php";
-        $file = dirname(__DIR__, 2).'/app/DataBase/migrations/'.$nameFile;
-        $file = fopen($file,"w+b");
-        if(!$file){
-            print('The migration: "'.$nameFile.'" was not created in the rute: '.$file);
-            return; 
-        }
-
-
-        // Escribir en el archivo:
-        $className = explode(".", $name)[0];        
-        $content = <<<EOT
-        <?php
-        class $className extends Migration {
-        
-            public function up() {
-                \$this->create("$className", function(\$table) {
-        
-                });
-            }
-        
-            public function down() {
-                \$this->dropIfExist("$className");
-            }
-        
-        }
-        EOT;
-        fwrite($file, $content);
-        
-        // Fuerza a que se escriban los datos pendientes en el buffer:
-        fflush($file);
-
-        
-
-        // Cerrar el archivo:
-        fclose($file);
-        consoleSuccess("The migration $nameFile was created successfully");
+    function __construct($path, $args){
+        $this->path = $path;
+        $this->args = $args;
     }
 
 
-    public function runMigrations(){
-        require dirname(__DIR__, 2)."/core/Helpers/sao/import.php";
-        require dirname(__DIR__, 2)."/core/DataBase/ORM/orm.php";
-        require dirname(__DIR__, 2)."/core/DataBase/Migrations/app.php";
-        require dirname(__DIR__, 2)."/core/Helpers/files.php";
-        $files = getDirsFilesByDirectory(dirname(__DIR__, 2).'/app/DataBase/migrations/');
-        for($i = 0; $i < count($files); $i++){
-            require_once $files[$i];
-            $nameClass = explode("/", explode("_", $files[$i])[0])[count(explode("/", explode("_", $files[$i])[0])) - 1];
-            $new = new $nameClass;
-            method_exists($new, 'down') ? $new->down() : consoleWarning("In the migration called '".$nameClass."' dont exist method down");
-            method_exists($new, 'up') ? $new->up() : consoleWarning("In the migration called '".$nameClass."' dont exist method up");
-            consoleSuccess("La migracion '".getFilesByDirectory(dirname(__DIR__, 2).'/app/DataBase/migrations/')[$i]."' was execute");
-        }
+    public function run(){
+        $this->runAppHelpers();
+        $this->runAppSaoHelpers();
+        $this->runAppAutoloaderComposer();
+        $this->runAppDataBase();
+        $this->runAppConsole();
+        exit;
+    }
+
+    private function runAppHelpers(){
+        include($this->path.'/core/Helpers/files.php');
+        include($this->path.'/core/Helpers/array.php');
+        include($this->path.'/core/Helpers/object.php');
+        include($this->path.'/core/Helpers/string.php');
+        include($this->path.'/core/Helpers/print.php');
+        include($this->path.'/core/Helpers/console.php');
+    }
+
+    private function runAppSaoHelpers(){
+        include($this->path.'/core/Helpers/sao/import.php');
+        include($this->path.'/core/Helpers/sao/controller.php');
+        include($this->path.'/core/Helpers/sao/core.php');
+        include($this->path.'/core/Helpers/sao/model.php');
+        include($this->path.'/core/Helpers/sao/response.php');
+        include($this->path.'/core/Helpers/sao/server.php');
+        include($this->path.'/core/Helpers/sao/validate.php');
+        include($this->path.'/core/Helpers/sao/view.php');
+    }
+
+    private function runAppDataBase(){
+        include($this->path.'/core/DataBase/ORM/orm.php');
+        include($this->path.'/core/DataBase/Migrations/app.php');
+    }
+
+    private function runAppCommandsSao(){
+        include($this->path.'/core/Console/commands.php');
+    }
+
+    private function runAppCommands(){
+        include($this->path.'/app/Console/console.php');
     }
 
 
+    private function runAppConsole(){
+        include($this->path."/core/Console/console.php");
+        $this->runAppCommandsSao();
+        $this->runAppCommands();
+        Jenu::set($this->args);
+        Jenu::run();
+    }
+
+
+    //Composer start app
+    private function runAppAutoloaderComposer(){
+        import('autoload.php', false, '/vendor');
+        $this->runAppVendorDotenv();
+    }
+    
+    private function runAppVendorDotenv(){
+         Dotenv\Dotenv::createImmutable($this->path)->load(); //Cargo la libreria de Dotenv para leer archivos env
+    }
+    //Composer end   app
 }
