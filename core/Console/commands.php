@@ -92,3 +92,27 @@ Jenu::command('endinstall', function($argrs){
     deleteDirectory($dirOldApp);
     Jenu::success("The project '$nameApp' was created correctily");
 });
+
+Jenu::command('serve', function($argrs){
+    $rute = '-t '.Jenu::baseDir().'/public';
+    $serverAdress = '-S localhost';
+    $port = '8080';
+    /* 
+        php -S localhost:8080 -t /public
+        php jenu /public/test
+        php jenu 127.0.0.1:8081 /public/test
+        php jeny 127.0.0.1:8081
+
+        el primer argumento siempre se espera que sea la ruta, y el segundo es opcional
+        y se espera que sea la direccion ip del servidor
+    */
+    if(isset($argrs[0])){
+        $rute = '-t '.Jenu::baseDir().$argrs[0];
+    }
+    if(isset($argrs[1])){
+        $serverAdress = "-S ".explode(':', $argrs[1]);
+        $port = explode(':', $argrs[1]);
+    }
+
+    exec("php $serverAdress:$port $rute");
+});
