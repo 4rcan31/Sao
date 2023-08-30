@@ -15,9 +15,15 @@ class Validate{
             array_push($this->validates, $this->required($campos));
         }else if($rule === 'contain'){
             array_push($this->validates, $this->contain($campos, $otros));
+        }else if($rule == 'email'){
+            array_push($this->validates, $this->email($campos));
         }else{
             res('Not validate named: '.$rule);
         }
+    }
+
+    private function email($campos){
+        return $this->contain($campos, ['@']);
     }
 
     public function required($campos){
