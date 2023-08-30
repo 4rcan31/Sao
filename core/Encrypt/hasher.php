@@ -3,7 +3,7 @@
 
 
 class Hasher{
-    public function hash($PasswordInTextPlane){
+    public static function make($PasswordInTextPlane){
         $r = password_hash(
             base64_encode(
                 hash('sha256', $PasswordInTextPlane, true)
@@ -13,7 +13,7 @@ class Hasher{
         return $r;
     }
 
-    public function verifyHash($PasswordInTextPlane, $hash){
+    public static function verify($PasswordInTextPlane, $hash){
         $r = password_verify(
             base64_encode(
                 hash('sha256', $PasswordInTextPlane, true)
