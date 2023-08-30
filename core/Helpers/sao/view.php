@@ -15,3 +15,12 @@ function view($html, $route = '', $format = 'php'){
         return false;
     }
 }
+
+
+function route($route){
+    echo routePublic(trim($route, '/'));
+}
+
+function NotifierPHP(){
+    core('Views/Notifier.php', false);
+}
