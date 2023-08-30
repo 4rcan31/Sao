@@ -127,7 +127,7 @@ class Request{
             $cookies = explode(';', Request::getAllHeaders()['Cookie']);
             for($i = 0; count($cookies) > $i; $i++){
                 $cookie = explode('=', $cookies[$i]);
-                $return[$cookie[0]] = $cookie[1];
+                $return[trim($cookie[0])] = $cookie[1];
             }
         }
         return $return;
