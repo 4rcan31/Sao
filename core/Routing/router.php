@@ -92,6 +92,11 @@ class Route extends Request{
         ]); 
     }
 
+    public static function redirec(string $page){
+        header("Location: $page");
+        exit;
+    }
+
 
 
     public static function group(callable $callable){     
