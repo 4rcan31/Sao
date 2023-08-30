@@ -181,11 +181,12 @@ class DataBase extends Connection{
 
     public function all($type = 'fetch'){
         if($type == 'fetch'){
-            return $this->responseSQL->fetch(PDO::FETCH_ASSOC);
+            return arrayToObject($this->responseSQL->fetch(PDO::FETCH_ASSOC));
         }else if($type == 'fetchAll'){
-            return $this->responseSQL->fetchAll(PDO::FETCH_ASSOC);
+            return arrayToObject($this->responseSQL->fetchAll(PDO::FETCH_ASSOC));
         }
     }
+
 
     public function fetchColum(){
         return $this->responseSQL->fetchColumn();
@@ -193,10 +194,7 @@ class DataBase extends Connection{
 
     public function exist(){
         $res = $this->all();
-        if($res === false){
-            return false;
-        }   
-        return true;
+        return $res === false ? false : true;
     }
 
     public function lastId(){
