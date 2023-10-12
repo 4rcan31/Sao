@@ -1,12 +1,25 @@
 <?php
 class Time{
-    // Calcula la edad (formato: Year-M-Day)
-    public function CalcAgebyBirth($fecha_nacimiento){
-        $nacimiento = new DateTime($fecha_nacimiento);
-        $ahora = new DateTime(date("Y-m-d"));
-        $diferencia = $ahora->diff($nacimiento);
-        return $diferencia->format("%y");
+
+
+    /**
+     * Calculate age from birthdate.
+     *
+     * @param string $birthdate The birthdate in "YYYY-MM-DD" format.
+     *
+     * @return int The calculated age in years.
+     */
+    public function calculateAgeFromBirthdate($birthdate) {
+        $birthdate = new DateTime($birthdate);
+        $now = new DateTime(date("Y-m-d"));
+        $diff = $now->diff($birthdate);
+        return [
+            'years' => $diff->y,
+            'months' => $diff->m,
+            'days' => $diff->d,
+        ];
     }
+    
 
 
 
