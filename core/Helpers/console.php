@@ -9,11 +9,11 @@ function consoleError($err){
     printColor("Error: ".$err, '0;31');
 }
 
-function consoleWarning(string $warn){
-    printColor("Warning: ".$warn, '1;33');
+function consoleWarning(string $warn, bool $start = true){
+    $start ? printColor("Warning: ".$warn, '1;33') : printColor($warn, '1;33');
 }
 
-function consoleSuccess($messaje){
-    printColor("Success: ".$messaje, '0;32');
+function consoleSuccess($messaje, $start = true){
+    $start ? printColor("Success: ".$messaje, '0;32') : printColor($messaje, '0;32');
 }
 
