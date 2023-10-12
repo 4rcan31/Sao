@@ -5,15 +5,14 @@ function controller($controller, $function, $data = 'nulldata'){
     $controller = import('controllers/'.$controller.'.php');
     if($data == 'nulldata'){
      try{
-         $controller->{$function}();
-         return;
+         return $controller->{$function}();
      }catch(\Throwable $th){
-         throw new Exception('La funcion '.$function." espera parametros que no fueron definidos.");
+         throw new Exception("Error in Controller: $th");
          return;
      }
     }else{
-     $controller->{$function}($data);
-     return;
+        return $controller->{$function}($data);
+    
     }
  }
  
