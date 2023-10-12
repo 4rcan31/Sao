@@ -19,6 +19,7 @@ class run{
         $this->runAppSaoHelpers();
         $this->runAppAutoloaderComposer();
         $this->runAppDataBase();
+        $this->runAppTest();
         $this->runAppConsole();
         exit;
     }
@@ -41,6 +42,10 @@ class run{
         include($this->path.'/core/Helpers/sao/server.php');
         include($this->path.'/core/Helpers/sao/validate.php');
         include($this->path.'/core/Helpers/sao/view.php');
+    }
+
+    private function runAppTest(){
+        include($this->path."/core/Testing/Test.php");
     }
 
     private function runAppDataBase(){
