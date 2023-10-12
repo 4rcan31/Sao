@@ -10,3 +10,8 @@ function randomString($length){ //Genera un string aleatorio
     }
     return $rand_string;
 }
+
+
+function token($length = 32){
+    return bin2hex(random_bytes($length));
+}
