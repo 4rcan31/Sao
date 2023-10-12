@@ -43,11 +43,11 @@ function requires(array $requires, string $type = 'text/javascript'){
     for($i = 0; $i < count($requires); $i++){
         $format = format($requires[$i]);
         if($format == "ico"){
-             array_push($arrayRequires, '<link rel="icon" href="'.$requires[$i].'" />');
+             array_push($arrayRequires, '<link rel="icon" href="'.$requires[$i].'" />')."\n";
         }else if($format == "css"){
-            array_push($arrayRequires, '<link rel="stylesheet" href="'.$requires[$i].'" />');
+            array_push($arrayRequires, '<link rel="stylesheet" href="'.$requires[$i].'" />'."\n");
         }else if($format == 'js'){
-            array_push($arrayRequires, '<script type="'.$type.'" src="'.$requires[$i].'" ></script>');
+            array_push($arrayRequires, '<script type="'.$type.'" src="'.$requires[$i].'" ></script>'."\n");
         }
     }
     return $arrayRequires;
@@ -62,6 +62,8 @@ function requires(array $requires, string $type = 'text/javascript'){
  function routePublic($route){
     return server()->RouteAbsolute($route);
  }
+
+
 
  function routeAppPublic($route){
     return server()->RouteAbsolute("app/".$route);
