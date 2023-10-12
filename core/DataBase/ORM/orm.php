@@ -7,6 +7,8 @@ class DataBase extends Connection{
     public $data = [];
     public $responseSQL;
     public $judgmentExecuted;
+    public $querys = [];
+
 
 
     public function connection(){
@@ -16,6 +18,10 @@ class DataBase extends Connection{
     public function prepare(){
         $this->query = '';
         $this->data = [];
+    }
+
+    public function nameDataBase(){
+        return $this->query('SELECT DATABASE() AS dbname')->fetch()['dbname'];
     }
 
     public function select($colums = [], $all = true){
@@ -57,6 +63,11 @@ class DataBase extends Connection{
     public function from($table){
         $query = ' FROM '.$table;
         $this->query = $this->query.$query;
+        return $this;
+    }
+
+    public function orderBy($query){
+        $this->query = $this->query.' ORDER BY '.$query;
         return $this;
     }
 
@@ -105,6 +116,18 @@ class DataBase extends Connection{
         $this->query = $this->query.$query;
     }
 
+    public function whereIn(string $colum, array $values) {
+        if (empty($values)) {
+            throw new Exception('You have not specified any values for the IN clause.');
+        }
+    
+        $placeholders = implode(', ', array_fill(0, count($values), '?'));
+    
+        $this->query .= "WHERE $colum IN ($placeholders)";
+        $this->data = array_merge($this->data, $values);
+    }
+    
+
     public function count($colums = []){
         if(empty($colums)){
             $query = ' COUNT(*)';
@@ -119,22 +142,28 @@ class DataBase extends Connection{
         return $this;
     }
 
-    public function update(String $table, Array $datos = []){
-        if(empty($datos)){
+
+
+    public function update(string $table, array $data = []){
+        if (empty($data)) {
             throw new Exception('You have not specified the data.');
             return false;
         }
-        $query = " UPDATE ".$table." SET ";
-        $updateData = ' ';
-        foreach($datos as $colums => $values){
-            array_push($this->data, $values);
-            $updateData = $updateData." ".$colums." = ?";
+    
+        $query = "UPDATE {$table} SET ";
+        $updateData = [];
+        
+        foreach ($data as $column => $value) {
+            array_push($this->data, $value);
+            $updateData[] = "{$column} = ?";
         }
-        $query = $query.$updateData;
-        $this->query = $this->query.$query;
+        
+        $query .= implode(', ', $updateData);
+        $this->query = $query;
+        
         return $this;
     }
-
+    
     public function delete(String $table){
         $query = ' DELETE FROM '.$table;
         $this->query = $this->query.$query;
@@ -147,14 +176,18 @@ class DataBase extends Connection{
             'data' => $this->data
         ];
     }
+    public function getQuerys(){
+        return $this->querys;
+    }
 
     //Esta funcion es la que ejecuta una query
     public function query(String $query, $data = []){
+        array_push($this->querys, $this->queryString());
         return $this->executeSql($query, $data);
     }
 
     public function executeSql(String $query, $data){
-        $responseSQL = $this->connection->prepare($query);
+        $responseSQL = $this->connection()->prepare($query);
         if($responseSQL){
             if($responseSQL->execute($data)){
                 return $responseSQL;
@@ -181,9 +214,16 @@ class DataBase extends Connection{
 
     public function all($type = 'fetch'){
         if($type == 'fetch'){
-            return arrayToObject($this->responseSQL->fetch(PDO::FETCH_ASSOC));
+
+            $response = $this->responseSQL->fetch(PDO::FETCH_ASSOC);
+            return is_array($response) ?
+            arrayToObject($response) :  
+            $response;
         }else if($type == 'fetchAll'){
-            return arrayToObject($this->responseSQL->fetchAll(PDO::FETCH_ASSOC));
+            $response = $this->responseSQL->fetchAll(PDO::FETCH_ASSOC);
+            return is_array($response) ?
+            arrayToObject($response) :  
+            $response;
         }
     }
 
@@ -198,6 +238,6 @@ class DataBase extends Connection{
     }
 
     public function lastId(){
-        return $this->connection->lastInsertId(); //No entiendo muy bien por que esta funcion nesesita la conexion y no la respuesta sql como las demas funciones
+        return $this->connection()->lastInsertId(); //No entiendo muy bien por que esta funcion nesesita la conexion y no la respuesta sql como las demas funciones
     }
 }
