@@ -1,7 +1,7 @@
 <?php 
 
 
-class Encrypt{
+ class Encrypt{
     protected $keyDefault = '123';
 
     
@@ -59,17 +59,4 @@ class Encrypt{
             }
     }
     //end decrypt
-
-
-
-    function salt($length) {
-        $rand_string = '';
-        for($i = 0; $i < $length; $i++) {
-            $number = random_int(0, 36);
-            $character = base_convert($number, 10, 36);
-            $rand_string .= $character;
-        }
-     
-        return $rand_string;
-    }
-}
+} 
