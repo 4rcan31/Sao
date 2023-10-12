@@ -1,118 +1,124 @@
 <?php
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
+import('Auth/token.php', false, '/core');
 
 class Sauth {
-    private static $data;
-    public static $token = '';
-    public static $time;
-    public static $nameSesion = 'session';
+    public static $token;
 
-    public static function token(Array $payload, string $key, $encrypter = true, $algori = 'HS256'){
-        $jwt = JWT::encode($payload, $key, $algori);
-        if($encrypter){
-            $jwt = core('Encrypt/encrypt.php')->encrypt($jwt, $key);
-        }
-        return $jwt;
-    }
-
-    public static function decode(string $token, string $key, $encrypter = true, $algori='HS256'){
-        if($encrypter){
-           
-            $tokent = core('Encrypt/encrypt.php')->decrypt($token, $key);
-            echo "<br>================================================ <br>";
-            var_dump($token);
-            echo "<br>================================================ <br>";
-        }
-        try {
-            $token  = JWT::decode($token, new Key($key, $algori));
-            echo "<br>================================================ <br>";
-            var_dump($token);
-            echo "<br>================================================ <br>";
-        } catch (\Throwable $th) {
-            $token = false;
-        }
-        /* Sauth::$data = $jwt; */
-        return $token;
-    }
-
-
-    public static function start(string $token, string $key){
-        try{
-            $token = Sauth::decode($token, $key);
-
-        }catch(Exception $e){
-            return false;
-        }
-        Sauth::$data = $token;
-        return true;
-    }
-
-    public static function data(string $key = ''){
-        if(empty($key)){
-            return Sauth::$data->data;
-        }
-        if(isset(Sauth::$data->data->$key)){
-            return Sauth::$data->data->$key;
-        }else{
-            throw new Exception("El indice $key no existe");
-        }
-    }
-
-    public static function set(Array $userData, string $key, int $timeInDays = 7, $encrypter = true,$algori = 'HS256'){
-        self::$time = time() + (86400 * $timeInDays);
-        self::$token = self::token([
-            'iat' => time(), // Tiempo que inició el token
-            'exp' => self::$time, // Tiempo que expirará el token 7 días
-            'data' => $userData
-        ], $key, $encrypter, $algori);
-        return self::$token;
-    }
-
-
-    public static function loginClient() {
-        try {
-            setcookie(self::$nameSesion, self::$token, self::$time, '/'); // La cookie expirará en 7 días
-        } catch (\Throwable $th) {
-            throw new Exception("Error interno", 1);
-        }
-
-    }
-
-    public static function loginServer(string $table, string $colum, int $id, $idColumName = 'id'){
+    public static function NewAuthServerSave(string $table, string $column, int $id, string $idColumnName = 'id') {
         import('DataBase/ORM/orm.php', false, '/core');
         $db = new DataBase;
         $db->prepare();
-        $db->select([$colum])->from($table)->where($idColumName, $id);
-        if(!$db->execute()->exist()){
-            throw new Exception("The user with id ".$id." dont exist", 1);
+        $db->select([$column])->from($table)->where($idColumnName, $id);
+
+        if (!$db->execute()->exist()) {
+            throw new Exception("The user with id $id doesn't exist", 1);
         }
+
         $db->prepare();
         $db->update($table, [
-            $colum => self::$token
-        ])->where($idColumName, $id);
+            $column => self::$token = new Token()
+        ])->where($idColumnName, $id);
+
         $db->execute();
+    }
+
+    public static function NewAuthClient(array $payload, string $key, int $timeInDays = 7) {
+        $tokenClient = json_encode([
+            'tokenSaveInDB' => self::$token->getToken(),
+            'payload' => $payload
+        ]);
+        setcookie(
+            'session',
+            import('Encrypt/encrypt.php', true, '/core')->encrypt($tokenClient, $_ENV['APP_KEY']),
+            time() + (86400 * $timeInDays),
+            '/'
+        );
+    }
+
+
+
+    public static function getPayLoadTokenClient(string $tokenRequest, string $key, string $input = '') {
+        try {
+            $tokenRequest = urldecode($tokenRequest);
+            $encrypt = import('Encrypt/encrypt.php', true, '/core');
+            $tokenDecrypt = $encrypt->decrypt($tokenRequest, $key);
+            $tokenDecrypt = json_decode($tokenDecrypt);
+            if($tokenDecrypt === null) {
+                return false;
+            }
+            $payload = $tokenDecrypt->payload;
+            return $input !== '' && property_exists($payload, $input) ? $payload->$input : $payload;
+        } catch (Exception $th) {
+            return false;
+        }
     }
     
 
-    public static function middleware($key){
-        var_dump(Request::$cookies);
-        return isset(Request::$cookies[self::$nameSesion]) && self::start(Request::$cookies[self::$nameSesion], $key) ?
-                true : false;
+    
+
+    public static function NewAuthServerJWT(array $payload, string $signature, string $algorithm = 'HS256') {
+        return self::$token = new JsonWebToken($payload, $signature, $algorithm);
     }
 
-    public static function getToken(){
-        return isset(Request::$cookies[self::$nameSesion]) && self::start(Request::$cookies[self::$nameSesion], $_ENV['APP_KEY']) ?
-                Request::$cookies[self::$nameSesion] : null;
+    public static function middlewareAuthServerAndClient(string $userToken, string $key, string $table, string $column, int $id, string $idColumnName = 'id') {
+        $userToken = urldecode($userToken);
+        import('DataBase/ORM/orm.php', false, '/core');
+        $tokenSaveDB = json_decode(import('Encrypt/encrypt.php', true, '/core')->decrypt($userToken, $key))->tokenSaveInDB;
+        $db = new DataBase;
+        $db->prepare();
+        $db->select([$column])->from($table)->where($idColumnName, $id);
+
+        if (!$db->execute()->exist()) { //Esto es por que se envio un token con un id, pero ese id no existe
+            Sauth::logoutClient(); //A si que ese token guardado en el cliente se elimina 
+            return false; //Y el middleware retorna false
+        }
+        $tokenSave = $db->execute()->all()->remember_token;
+        if (is_array($tokenSave)) {
+            return in_array($tokenSaveDB, $tokenSave, true);
+        } elseif (is_string($tokenSave)) {
+            return hash_equals($tokenSave, $tokenSaveDB);
+        }
+
+        return false;
+    }
+
+    public static function middlewareAuthJsonWebToken(string $token, string $signature, string $algorithm = 'HS256') {
+        return new VerifyJsonWebToken($token, $signature, $algorithm);
+    }
+
+    public static function getPayloadAuthJsonWebToken(string $token, string $signature, string $algorithm = 'HS256') {
+        return new getPayLoad($token, $signature, $algorithm);
+    }
+
+    public static function authenticableClient($key, $cookieName = 'session'){
+        return !isset(Request::$cookies[$cookieName]) ? 
+                [] : 
+                json_decode(import('Encrypt/encrypt.php', true, '/core')->decrypt(urldecode(Request::$cookies[$cookieName]), $key))->payload;
     }
 
 
+    public static function logoutServer(string $table, string $column, int $id, string $idColumnName = 'id'){
+        import('DataBase/ORM/orm.php', false, '/core');
+        $db = new DataBase;
+        $db->prepare();
+        $db->select([$column])->from($table)->where($idColumnName, $id);
+        if (!$db->execute()->exist()) {
+            throw new Exception("The user with id $id doesn't exist", 1);
+        }
+        $db->prepare();
+        $db->update($table, [
+            $column => null
+        ])->where($idColumnName, $id);
+        $db->execute();
+        return;
+    }
+
+    public static function logoutClient(){
+        setcookie('session', '', time() - 3600, '/');
+        setcookie('session', '', time() - 3600, '/', $_SERVER['SERVER_NAME']);
+        if (isset($_COOKIE['session'])) {
+            unset($_COOKIE['session']);
+        }
+    }
 }
-
-
-
-
-
-
-
 
