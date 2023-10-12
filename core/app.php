@@ -12,9 +12,11 @@ class Sao{
 
     //Start Autoloader
     public function run(){
+        $this->runAppSession();
         $this->runAppHelpers();
         $this->runAppSaoHelpers();
         $this->runAppAutoloaderComposer();
+        $this->runAppServe();
         $this->runAppHttp();
         $this->runAppRouting();
         $this->runAppAuth();
@@ -33,7 +35,7 @@ class Sao{
     }
     private function runAppRequest(){
         import('Http/request.php', false, '/core');
-        Request::capture();
+        Request::capture($this->path);
     }
     private function runAppResponse(){
         import('Http/response.php', false, '/core');
@@ -88,13 +90,23 @@ class Sao{
     //End App App
 
     private function runAppRoutes(){
+        //NOTA: No puede existir un grupo que no contenga por lo menos una ruta, o que contega solamente un grupo
         Route::group(function(){ // Hay un grupo por default que engloba todas las rutas que se definen por el usuario, esto es por que da error si no lo hago
-            import('routes', false, '/'); //Aca se importan todas las rutas definidas
+            import('routes', false, '/app'); //Aca se importan todas las rutas definidas
         });
         Route::run(); // Ejecuto la app de ruteo con todas las rutas ya definidas
     }
 
+    private function runAppServe(){
+        import('server/server.php', false, '/core');
+    }
 
+
+
+    private function runAppSession(){
+        session_name('SAOSESSID');
+        session_start();
+    }
 
 
     //Composer start app
