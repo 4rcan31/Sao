@@ -1,15 +1,21 @@
 <?php
 
 
-function view($html, $route = '', $format = 'php'){
+function view($html, $data = [], $route = '', $format = 'php'){
     try {
-       // import('Views', false, '/core');
-        core('Views', false); //Importamos todo el core de las vistas
-        if(empty($route)){
-            import("Views/$html.$format", false);
-        }else{
-            import("$route/$html.$format", false, '/');
-        }
+        print("
+        <!--
+            Powered by Sao
+            GitHub: https://github.com/4rcan31/Sao
+        
+            Developed by: 4rcane31
+        -->    
+        ");
+        core('Views', false);
+        ViewData::setData($data);
+        // Asegúrate de que $route esté configurado correctamente según tus necesidades.
+        $viewPath = empty($route) ? "Views/$html.$format" : "$route/$html.$format";
+        import($viewPath, false);
         return true;
     } catch (\Throwable $th) {
         return false;
@@ -17,10 +23,13 @@ function view($html, $route = '', $format = 'php'){
 }
 
 
-function route($route){
-    echo routePublic(trim($route, '/'));
+function route($route, $print = true){
+    return $print ? 
+    print(routePublic(trim($route, '/'))) :
+    routePublic(trim($route, '/'));
 }
 
-function NotifierPHP(){
+
+function Form(){
     core('Views/Notifier.php', false);
 }
