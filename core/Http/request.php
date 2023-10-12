@@ -11,9 +11,11 @@ class Request{
     public static $headers = []; //Aca se guardan todos los headers de la peticion
     public static $cookies = []; //Aca se guardan todas las cookies mandadas de la peticion
     public static $tokenRequest = ''; //Aca se guardara un token unico aleatorio de la peticion
+    public static $path = ''; //Aca se guardara el path base de la aplicaion;
 
 
-    public static function capture(){
+    public static function capture(string $path){
+        Request::$path = $path;
         Request::$method = $_SERVER["REQUEST_METHOD"];
         Request::$uri = (parse_url('/'.trim($_SERVER["REQUEST_URI"], '/'), PHP_URL_PATH));
         Request::$requestTime = $_SERVER['REQUEST_TIME'];   
@@ -30,18 +32,27 @@ class Request{
     public static function data(){
         $dataRequestInput = json_decode(file_get_contents("php://input"));
         $dataRequestPhp = $_REQUEST;
+        $dataFiles = $_FILES;
+        
         $data = [];
-        if(!empty($dataRequestInput) && !empty($dataRequestPhp)){
-            $data = array_merge(objectToArray($dataRequestInput), $dataRequestPhp);
-        }else if(!empty($dataRequestInput)){
-            $data = objectToArray($dataRequestInput);
-        }else if(!empty($dataRequestPhp)){
-            $data = $dataRequestPhp;
-        }else{
-            $data = [];
+    
+        if (!empty($dataRequestInput)) {
+            $data = array_merge(objectToArray($dataRequestInput), $data);
         }
+    
+        if (!empty($dataRequestPhp)) {
+            $data = array_merge($dataRequestPhp, $data);
+        }
+    
+        if (!empty($dataFiles)) {
+            import('Resources', false, '/core');
+            File::setBasePath(Request::$path);
+            $data = array_merge($dataFiles, $data);
+        }
+    
         return $data;
     }
+    
 
 
     public static function getIpAddress(){
