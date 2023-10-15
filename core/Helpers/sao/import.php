@@ -1,6 +1,6 @@
 <?php
 
-function import($module, $return = true, $route = '/app', $data = []){
+function import(string $module, bool $return = true, string $route = '/app', array $data = []){
     $dir = dirname(__DIR__,3).'/'.trim($route, '/').'/'.$module;
     if(file_exists($dir)){
         if(is_dir($dir)){
