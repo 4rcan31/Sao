@@ -8,7 +8,7 @@ Aquí te presentamos algunos proyectos destacados que se han desarrollado utiliz
 
 1. **Proyecto FTechnology**
    - Repositorio: [FTechnology en GitHub](https://github.com/4rcan31/FTechnolgy)
-   - Descripción: Este proyecto se centra en el desarrollo de una aplicación para ventas de mascotas y el control de Croquette, un dispensador de comida para mascotas basado en hardware. Sao se utiliza como el framework principal para crear esta aplicación, lo que demuestra su versatilidad y capacidad para abordar proyectos variados.
+   - Descripción: Este proyecto se centra en el desarrollo de una aplicación para ventas de productos de mascotas y el control de Croquette, un dispensador de comida para mascotas basado en hardware. Sao se utiliza como el framework principal para crear esta aplicación, lo que demuestra su versatilidad y capacidad para abordar proyectos variados.
 # Instalación
 
 Para descargar Sao, ejecuta:
