@@ -5,7 +5,7 @@
     protected $keyDefault = '123';
 
     
-    public function encrypt($string, $key){
+    public function encrypt(string $string, string $key){
         $ivlen = openssl_cipher_iv_length("AES-128-CBC");
         $iv = openssl_random_pseudo_bytes($ivlen);
         $ciphertext_raw = openssl_encrypt(base64_encode($string), 'AES-128-CBC', $key, OPENSSL_RAW_DATA , $iv);
@@ -27,7 +27,7 @@
 
 
     //start decrypt
-    public function decrypt($string, $key){
+    public function decrypt(string $string, string $key){
         $string = $this->decode($string, $key.$this->keyDefault);
         $c = base64_decode($string);
         $ivlen = openssl_cipher_iv_length($cipher="AES-128-CBC");
