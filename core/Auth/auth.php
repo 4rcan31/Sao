@@ -22,14 +22,16 @@ class Sauth {
         $db->execute();
     }
 
-    public static function NewAuthClient(array $payload, string $key, int $timeInDays = 7) {
+    public static function NewAuthClient(array $payload, string $key = null, int $timeInDays = 7) {
         $tokenClient = json_encode([
             'tokenSaveInDB' => self::$token->getToken(),
             'payload' => $payload
         ]);
         setcookie(
             'session',
-            import('Encrypt/encrypt.php', true, '/core')->encrypt($tokenClient, $_ENV['APP_KEY']),
+            import('Encrypt/encrypt.php', true, '/core')->encrypt(
+                $tokenClient, 
+                $key == null ? $_ENV['APP_KEY'] : $key),
             time() + (86400 * $timeInDays),
             '/'
         );
@@ -113,11 +115,11 @@ class Sauth {
         return;
     }
 
-    public static function logoutClient(){
-        setcookie('session', '', time() - 3600, '/');
-        setcookie('session', '', time() - 3600, '/', $_SERVER['SERVER_NAME']);
-        if (isset($_COOKIE['session'])) {
-            unset($_COOKIE['session']);
+    public static function logoutClient($cookieName = 'session'){
+        setcookie($cookieName, '', time() - 3600, '/');
+        setcookie($cookieName, '', time() - 3600, '/', $_SERVER['SERVER_NAME']);
+        if (isset($_COOKIE[$cookieName])) {
+            unset($_COOKIE[$cookieName]);
         }
     }
 }
