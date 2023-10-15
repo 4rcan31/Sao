@@ -21,6 +21,18 @@ class BaseController{
     public function host(){
         return $_ENV['APP_SERVER_CROQUETTE_HOST'].":".$_ENV['APP_SERVER_CROQUETTE_PORT'];
     }
+
+
+    public function clientAuth($cookie = 'session', $key = null) {
+        $cookie = Request::$cookies[$cookie] ?? null;
+        if ($cookie === null) {
+            return false;
+        }
+        return Sauth::getPayLoadTokenClient(
+            $cookie, 
+            $key ?? $_ENV['APP_KEY']
+        );
+    }
     
     
     
