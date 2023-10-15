@@ -1,87 +1,72 @@
-# Sao
-## _Framework basado en php_
-
-
+# Sao - Un Framework de PHP
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://github.com/4rcan31/Sao)
 
-Sao es un framework basado en php para construir aplicaciones web rapido y eficientes, con sistema de enrutado, siguiendo el diseno `MVC` (Modelo Vista Controlador), este framework se construyo como metodo de aprendizaje, pero puede llegar a mas
+Sao es un framework de desarrollo web en PHP diseñado para crear aplicaciones de manera rápida y eficiente. Utiliza el enrutamiento y sigue el patrón de diseño Modelo Vista Controlador (MVC). Aunque inicialmente se creó con fines educativos, Sao es un marco que puede utilizarse en proyectos más grandes.
 
+## Características Destacadas
 
-## Caracteristicas
+- Generación de rutas de forma programática sin necesidad de modificar el archivo `.htaccess`.
+- Sistema de maquetación basado en "0 HTML" que permite escribir código HTML utilizando funciones PHP.
+- Incluye un ORM básico para procesar consultas `select`.
+- Adherencia al patrón de diseño Modelo Vista Controlador (MVC).
 
-- Creacion de rutas desde codigo php sin tocar el archivo htacces
-- Sistema de maquetado `0 HTML`, que te permite escribir codigo html con funciones php
-- Cuenta con un ORM basico que procesa consultas `select`
-- Funciona mediante el diseno MVC
+## Instalación
 
-## Instalacion
+Para usar Sao, es necesario tener [Laragon](https://laragon.org/download.html) instalado.
 
-Sao require [Laragon](https://laragon.org/download.html) para funcionar
+1. Clona el repositorio Sao en tu servidor Apache:
+   ```sh
+   git clone https://github.com/4rcan31/Sao.git
+   ```
 
-Para instalar el proyecto primero debemos de clonar el repositorio de Sao en nuestro servidor apache 
+2. Accede al directorio clonado:
+   ```sh
+   cd Sao
+   ```
 
-```sh
-git clone https://github.com/4rcan31/Sao.git
-```
-Y luego entrar
-```sh 
-cd Sao
-```
+3. Para cargar las variables de entorno definidas en el archivo `.env`, se requiere la biblioteca `vlucas/phpdotenv`. Si no tienes Composer instalado, descárgalo [aquí](https://getcomposer.org/download) y ejecuta el siguiente comando:
+   ```sh
+   composer require vlucas/phpdotenv
+   ```
 
-Para leer nuestras variables de entorno .ENV, es necesario instalar la biblioteca `dotenv` de vlucas, teniendo en cuenta que tienes instalado [Composer](https://getcomposer.org/download/), ejecutamos: 
+Con estos pasos, Sao estará listo para funcionar. Asegúrate de que Laragon esté en ejecución y luego navega a `sao.test:8080` en tu navegador.
 
-```sh
-composer require vlucas/phpdotenv
-```
-
-Listo, ya tenemos a Sao instalado, solo faltaria encender Laragon, entrar a `sao.test:8080` y esta corriendo
-
-## Tech ¿Como usar Sao?
+## Uso de Sao
 
 ### Rutas
 
-Toda la aplicacion empieza por el diseno de rutas, para eso tienes que irte al archivo `routes/web.php`, y aca podras configurar todas las rutas de tu aplicacion, ¿Como lo haces?, para esto puedes ocupar el metodo `get, post, put, delete` de la clase `Router`:
+En Sao, la configuración de las rutas es el primer paso para crear una aplicación. Esto se logra mediante el archivo `routes/web.php`, donde puedes definir todas las rutas de tu aplicación. Puedes utilizar los métodos `get`, `post`, `put` y `delete` de la clase `Router`:
 
 ```php
-<?php
- Router::get();
- Router::post();
- Router::put();
- Router::delete();
-```
-
-Esta funcion recibe 2 parametros, el primero es la ruta definida, y el segundo es un callback (una funcion anonima) que se ejecutara cuando la ruta definida se visite
-
-```php
-<?php
 Router::get('/', function($data){
-
+    // Tu código aquí
 });
 ```
-El callback resive un parametro `$data` que son todos los datos que vieden del request, 
 
-## Luego que? 
+La función de callback recibe un parámetro `$data`, que contiene todos los datos de la solicitud.
 
-Sao es un framework unopinionated, esto significa que no requeriras aprender muchas convecciones para programar tu aplicacion, si seguimos todo lo que sabemos de Sao hasta ahora, en nuestro callback pudieramos ejecutar absolutamente toda la aplicacion sin hacer uso de diseno MVC, pero claro, tenemos que hacer `buenas practicas`, y llamar al controlador que controlara esta ruta, y para eso existe la funcion `controller()` que resive 5 parametros 
+### Controladores
 
+Sao no impone muchas convenciones, lo que te permite estructurar tu aplicación según tus necesidades. Aunque podrías ejecutar toda la aplicación en el callback de la ruta, se recomienda seguir buenas prácticas. Puedes utilizar el método `controller()` para llamar a un controlador que maneje la lógica de una ruta:
+
+```php
+Router::get('/', function($data){ 
+   controller('IndexController', 'home', 'table.model', $data);
+});
 ```
-controller(string $nameController, string $function, string $nameModel, Array $data = [], Array imports = []): bool
-```
-#### $nameController
-Es el nombre del controlador de esta ruta, y no hace falta poner la extencion, por que se entiende que siempre sera `.php`, los controladores se definen en `app/Controllers`, la funcion `controller()` ira a buscar el controlador a esa ruta, y el nombre del controlador debe ser igual al nombre de la clase del controlador, cada controlador se tiene que extender de la clase `BaseController`
-#### $function
-Esta es el metodo definido en la clase del controlador que se ejecutara cuando se llame la ruta
-#### $nameModel
-Cada controlador tendra su propio Modelo, y el tercer parametro es para eso, para definir el modelo del controlador, como `$nameController`, solamente tendras que especificar el nombre del modelo, y la funcion lo ira a buscar a `app/Models`, la clase del Modelo se tiene que extender de la clase `BaseModel` Esto para usar el ORM 
-#### $data
-Esta es toda la `data` que le podras pasar al metodo que se definio en `$function`
-#### $imports
-Aca se podran enviar clases para luego guardarlas en un constructor en la clase del `Controlador` que se definio en `$nameController`
 
-## DataBase
+La función `controller()` recibe los siguientes parámetros:
 
-Para configurar la base de datos tienes que crear el archivo `.env`, y pegar lo siguiente: 
+- `$nameController`: El nombre del controlador que debe coincidir con el nombre de la clase en `app/Controllers`.
+- `$function`: El nombre del método en la clase del controlador que se ejecutará al visitar la ruta.
+- `$nameModel`: El nombre del modelo correspondiente al controlador (debe coincidir con el nombre de la clase en `app/Models`).
+- `$data`: Todos los datos necesarios para el método especificado.
+- `$imports`: Clases que se guardarán en un constructor del controlador para su uso posterior.
+
+### Base de Datos
+
+La configuración de la base de datos se realiza en el archivo `.env`. Debes definir tus credenciales de base de datos en este archivo.
 
 ```env
 APP_NAME=Sao
@@ -97,20 +82,23 @@ DB_DATABASE=testing_api
 DB_USERNAME=root
 DB_PASSWORD=
 ```
-Solo tienes que igualar las variables a los datos de tu base de datos 
 
+Nota: La función `hash` en Sao es unidireccional y no se puede revertir.
 
-## Controladores
+## Controladores en Sao
 
-Ahora que ya sabemos como definir rutas y como llamar al controlador, podemos enviar vistas
+En Sao, los controladores se utilizan para administrar la lógica de la aplicación. Siguiendo buenas prácticas, se llama al controlador desde el archivo de rutas para mantener la estructura MVC. Aquí hay un ejemplo de cómo se utiliza un controlador en Sao:
 
-`web.php`
+### routes/web.php
+
 ```php
 Router::get('/', function($data){ 
    controller('IndexController', 'home', 'table.model', $data);
 });
 ```
-`Controllers/IndexController.php`
+
+### Controllers/IndexController.php
+
 ```php
 class IndexController extends BaseController{
     public function home($data){
@@ -118,9 +106,13 @@ class IndexController extends BaseController{
     }
 }
 ```
-`app/Views/index.php`
+
+### app/Views/index.php
+
 ```php
 <?php
+
+
 
 inithtml();
 html('s', [
@@ -136,91 +128,27 @@ headRemast('Home', requires([
 
 html('e');
 ```
-Cuando descubri los ORM y entender que las consultas SQL no son mas que texto, tambien podemos usar este principio en html, ya que html no es mas que texto, y php nos permite trabajar con string. en php siempre se miro feo ejecutar `bucles` o `condiciones` en el codigo html, ahora podras ejecutar `bucles` o `condiciones` en codigo php, como se deberia de hacer, las funciones de html tienen la estructura siguiente: 
-```php
-nameEtiqueta(string $principioOFin, Array $attributes = []);
-```
-poner una `s` de `start` si es el principio de la etiqueta, y luego una `e` de `end` si es el final de la etiqueta. Este modelo no soporta todas las etiquetas html, por que claramente no me las se todas, pero si quieres poner una etiqueta que no esta definida puedes hacer uso de la funcion `newHtml()`
-```
-newHtml(string $principioOFin, string $nameEtiqueta,  Array $attributes = []): bool
-```
-Pero si quieres definir la etiqueta, o sea una nueva funcion puedes irte a `core/Views/html.php`, y seguir la estructura que esta ahi, tampoco es tan dificil.
 
-### Los atributos de las etiquetas
+Con Sao, puedes ejecutar bucles y condicionales en tu código HTML mediante funciones PHP. Para ello, puedes utilizar las funciones de creación de etiquetas HTML disponibles en Sao, siguiendo la estructura `nombreEtiqueta('s', $atributos)`. Estas funciones permiten definir etiquetas HTML, agregar atributos y contenido. Además, Sao admite la creación de nuevas funciones HTML personalizadas.
 
-El segundo parametro de las funciones es `$attributes` y por defecto es un array vacio, como puedo poner atributos?
-para eso, puedes seguir la siguiente estructura: 
-```php
-div('s', [
-    'class' => 'container', 
-    'id' => 'NameIdDivContainer'
-]);
-```
-O tambien puede poner los atributos en una sola linea
-```php
-div('s', [
-    'class="container" id="NameId"'
-]);
-```
-Si no quieres usar este sistema de html puedes escribir el html convencional
+### Helpers en Sao
 
-### Funciones Helpers 
+Sao proporciona dos helpers útiles: `Encrypt` y `Hasher`.
 
-#### Encrypter
-#### encrypt();
-Sao cuenta con metodos de encrytptado y has 
-```php
-Encrypt()->encrypt(string $string, string $key): string
-```
+#### Encrypt
 
-##### $string
-Esta es la cadena a encriptar
-##### $key
-Esta es la llave para encriptar `$string`
+`Encrypt` ofrece funciones para cifrar y descifrar datos:
 
-#### encrypt();
-```php
-Encrypt()->decrypt(string $string, string $key): string
-```
-Nota: Este metodo siempre genera cadenas diferentes aunque sea la misma key o el mismo string 
+- `encrypt($string, $key)` cifra una cadena de texto.
+- `decrypt($string, $key)` descifra una cadena de texto previamente cifrada.
 
-##### $string
-Esta es la cadena a desencriptar
-##### $key
-Esta es la llave con la que se encripto `$string` con la funcion `Encrypt()->decrypt();`
+#### Hasher
 
-#### hash();
-```php
-Hasher()->hash(string $string): string
-```
-##### $string
-Es la cadena que quiere hashear
+`Hasher` proporciona funciones de hash:
 
-Nota: la funcion `hash` es de una sola direccion, esto significa que NO podra ser desencriptada
+- `hash($string)` crea un hash de una cadena de texto.
+- `verifyHash($string, $hash)` verifica si una cadena de texto coincide con un hash existente.
 
-#### verifyHash();
-```php
-Hasher()->verifyHash(string $string, string $hash): bool
-```
-##### $string
-Es la cadena en texto plano para conpararla con el $hash que creo `has()`
-##### $hash
-El hash que creo la funcion `hash()`
-
-### View()
-```php
-view(string $html, string $route = ''): bool
-```
-#### $html
-Este es el nombre del archivo, la funcion ira a buscar los archivos html en `app/Views` 
-###$ $route
-En el dado caso que requieras un archivo que no este en `app/Views', puedes definirlo en esta ruta
-
-
-
-
-## License
+## Licencia
 
 MIT
-
-
