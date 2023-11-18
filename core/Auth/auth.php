@@ -10,8 +10,8 @@ class Sauth {
         $db->prepare();
         $db->select([$column])->from($table)->where($idColumnName, $id);
 
-        if (!$db->execute()->exist()) {
-            throw new Exception("The user with id $id doesn't exist", 1);
+        if (!$db->execute()->exists()) {
+            throw new Exception("The user with id $id doesn't exists", 1);
         }
 
         $db->prepare();
@@ -54,6 +54,21 @@ class Sauth {
             return false;
         }
     }
+
+    public static function getPayLoadTokenAll(string $tokenRequest, string $key) {
+        try {
+            $tokenRequest = urldecode($tokenRequest);
+            $encrypt = import('Encrypt/encrypt.php', true, '/core');
+            $tokenDecrypt = $encrypt->decrypt($tokenRequest, $key);
+            $tokenDecrypt = json_decode($tokenDecrypt);
+            if($tokenDecrypt === null) {
+                return false;
+            }
+            return $tokenDecrypt;
+        } catch (Exception $th) {
+            return false;
+        }
+    }
     
 
     
@@ -70,7 +85,7 @@ class Sauth {
         $db->prepare();
         $db->select([$column])->from($table)->where($idColumnName, $id);
 
-        if (!$db->execute()->exist()) { //Esto es por que se envio un token con un id, pero ese id no existe
+        if (!$db->execute()->exists()) { //Esto es por que se envio un token con un id, pero ese id no existe
             Sauth::logoutClient(); //A si que ese token guardado en el cliente se elimina 
             return false; //Y el middleware retorna false
         }
@@ -104,7 +119,7 @@ class Sauth {
         $db = new DataBase;
         $db->prepare();
         $db->select([$column])->from($table)->where($idColumnName, $id);
-        if (!$db->execute()->exist()) {
+        if (!$db->execute()->exists()) {
             throw new Exception("The user with id $id doesn't exist", 1);
         }
         $db->prepare();
