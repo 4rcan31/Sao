@@ -54,7 +54,10 @@ class run{
     }
 
     private function runAppCommandsSao(){
-        include($this->path.'/core/Console/commands.php');
+        include($this->path.'/core/Console/commands/help.php');
+        include($this->path.'/core/Console/commands/database.php');
+        include($this->path.'/core/Console/commands/server.php');
+        include($this->path.'/core/Console/commands/string.php');
     }
 
     private function runAppCommands(){

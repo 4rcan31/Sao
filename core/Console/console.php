@@ -20,8 +20,8 @@ class Jenu{
         return self::$date;
     }
 
-    public static function baseDir(){
-        return dirname(dirname(__DIR__));
+    public static function baseDir($dir = ""){
+        return dirname(dirname(__DIR__)).$dir;
     }
 
     public static function condition(string $pront){

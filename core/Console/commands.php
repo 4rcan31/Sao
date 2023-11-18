@@ -155,7 +155,7 @@ Jenu::command('make:token', function($args){
 }, 'Generate tokens string', 'Sao:String');
 
 
-Jenu::command('get:database', function(){
+Jenu::command('backup:database', function(){
     $return = '';
     $database = new DataBase;
     $namedb = $database->nameDataBase();
