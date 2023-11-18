@@ -228,14 +228,22 @@ class DataBase extends Connection{
     }
 
 
-    public function fetchColum(){
+    public function fetchColumn(){
         return $this->responseSQL->fetchColumn();
     }
 
-    public function exist(){
-        $res = $this->all();
-        return $res === false ? false : true;
+    public function first(){
+        return $this->responseSQL->first();
     }
+
+    public function pdo(){
+        return $this->connection;
+    }
+
+    public function exists() {
+        return $this->all() !== false;
+    }
+    
 
     public function lastId(){
         return $this->connection()->lastInsertId(); //No entiendo muy bien por que esta funcion nesesita la conexion y no la respuesta sql como las demas funciones
