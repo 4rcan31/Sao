@@ -12,6 +12,8 @@ function randomString($length){ //Genera un string aleatorio
 }
 
 
-function token($length = 32){
-    return bin2hex(random_bytes($length));
+function token($length = 32) {
+    return substr(bin2hex(
+        random_bytes(ceil($length / 2))
+    ), 0, $length);
 }
