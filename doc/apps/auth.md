@@ -79,7 +79,7 @@ class UserModel extends baseModel {
         $this->select(['email'])
         ->from('users')
         ->where('email', $email);
-        return $this->execute()->exist();
+        return $this->execute()->exists();
     }
 
     public function getByEmail(string $email) {
