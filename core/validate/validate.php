@@ -10,33 +10,33 @@ class Validate{
         $this->datos = $datos;    
     }
 
-    public function rule($rule, array $campos, mixed $otros = null){
+    public function rule($rule, array $fields, mixed $otros = null){
         if($rule === 'required'){
-            array_push($this->validates, $this->required($campos));
+            array_push($this->validates, $this->required($fields));
         }else if($rule === 'contain'){
-            array_push($this->validates, $this->contain($campos, $otros));
+            array_push($this->validates, $this->contain($fields, $otros));
         }else if($rule == 'email'){
-            array_push($this->validates, $this->email($campos));
+            array_push($this->validates, $this->email($fields));
         }else if($rule == 'is'){
-            array_push($this->validates, $this->is($campos, $otros));
+            array_push($this->validates, $this->is($fields, $otros));
         }else if($rule == 'in'){
-            array_push($this->validates, $this->in($campos, $otros));
+            array_push($this->validates, $this->in($fields, $otros));
         }else if($rule == 'numeric'){
-            array_push($this->validates, $this->numeric($campos));
+            array_push($this->validates, $this->numeric($fields));
         }else if($rule == 'phone'){
-            array_push($this->validates, $this->phoneNumber($campos));
+            array_push($this->validates, $this->phoneNumber($fields));
         }else{
             res('Not validate named: '.$rule);
         }
     }
 
-    private function email($campos){
-        return $this->contain($campos, ['@']);
+    private function email($fields){
+        return $this->contain($fields, ['@']);
     }
 
-    private function numeric(array $campos){
-        foreach($campos as $campo){
-            if(isset($this->datos[$campo]) && is_numeric($this->datos[$campo]) === false){
+    private function numeric(array $fields){
+        foreach($fields as $field){
+            if(isset($this->datos[$field]) && is_numeric($this->datos[$field]) === false){
                 return false;
             }
         }
@@ -64,14 +64,14 @@ class Validate{
     
     
 
-    public function required($campos){
-        foreach($campos as $campo){
-            if(!isset($this->datos[$campo])){
-                array_push($this->msg, "El campo '$campo' no existe.");
+    public function required($fields){
+        foreach($fields as $field){
+            if(!isset($this->datos[$field])){
+                array_push($this->msg, "El campo '$field' no existe.");
                 return false;
             }
-            if((empty($this->datos[$campo]) && $this->datos[$campo] !== false) || $this->datos[$campo] === null){
-                array_push($this->msg, "El campo $campo esta vacio.");
+            if((empty($this->datos[$field]) && $this->datos[$field] !== false) || $this->datos[$field] === null){
+                array_push($this->msg, "El campo $field esta vacio.");
                 return false;
             }
         }
