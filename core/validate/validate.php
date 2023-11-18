@@ -34,8 +34,13 @@ class Validate{
         return $this->contain($campos, ['@']);
     }
 
-    private function numeric($campo){
-        return isset($this->datos[$campo]) && is_numeric($this->datos[$campo]);
+    private function numeric(array $campos){
+        foreach($campos as $campo){
+            if(isset($this->datos[$campo]) && is_numeric($this->datos[$campo]) === false){
+                return false;
+            }
+        }
+        return true;
     }
 
 
