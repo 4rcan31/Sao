@@ -2,7 +2,7 @@
 
 
 function controller($controller, $function, $data = 'nulldata'){
-    $controller = import('controllers/'.$controller.'.php');
+    $controller = import('Controllers/'.$controller.'.php');
     if($data == 'nulldata'){
      try{
          return $controller->{$function}();

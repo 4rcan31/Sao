@@ -24,6 +24,7 @@ function deleteFormat($file){
 
 
 function getFilesByDirectory($dir){
+    $dir = rtrim($dir, DIRECTORY_SEPARATOR);
     $dirs = array();
     if ($handler = opendir($dir)) {
         while (false !== ($file = readdir($handler))) {

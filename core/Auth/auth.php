@@ -55,7 +55,7 @@ class Sauth {
         }
     }
 
-    public static function getPayLoadTokenAll(string $tokenRequest, string $key) {
+    public static function getPayLoadTokenAll(string $tokenRequest, string $key, string $input = '') {
         try {
             $tokenRequest = urldecode($tokenRequest);
             $encrypt = import('Encrypt/encrypt.php', true, '/core');

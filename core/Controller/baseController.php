@@ -50,7 +50,7 @@ class BaseController{
     
 
     public function host(){
-        return $_ENV['APP_ADDRESS'].":".$_ENV['APP_PORT'];
+        return $_ENV['APP_SERVER_CROQUETTE_HOST'].":".$_ENV['APP_SERVER_CROQUETTE_PORT'];
     }
 
     public function setInputs($request){
@@ -101,6 +101,10 @@ class BaseController{
             $key ?? $_ENV['APP_KEY']
         );
     }
+
+
+    
+    
     
     
 }

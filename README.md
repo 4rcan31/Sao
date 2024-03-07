@@ -26,7 +26,7 @@ rmdir /s /q sao\.git
 
 En sistemas Unix o Linux (incluyendo macOS), usa el comando `rm`:
 ```sh
-rm -rf sao/.git
+rm -rf Sao/.git
 ```
 
 Ahora solo necesitas cambiar el nombre de la carpeta `Sao` al nombre de tu proyecto. Utiliza el comando:
@@ -38,7 +38,7 @@ ren sao nombre_de_tu_app
 
 En Unix, Linux o macOS:
 ```sh
-mv sao nombre_de_tu_app
+mv Sao nombre_de_tu_app
 ```
 
 Ahora puedes ingresar a tu proyecto ejecutando:
